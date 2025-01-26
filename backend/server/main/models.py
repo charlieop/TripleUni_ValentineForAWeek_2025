@@ -4,6 +4,29 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
+class WeChatInfo(models.Model):
+    def generateUploadPath(self, filename):
+        ext = filename.split('.')[-1]
+        modified_filename = '{}.{}'.format(self.openid, ext)
+        return f"uploads/wechat_headimg/{modified_filename}"
+
+    openid = models.CharField(max_length=50, primary_key=True, verbose_name="OpenID")
+    nickname = models.CharField(max_length=50, verbose_name="昵称")
+    head_image = models.ImageField(upload_to=generateUploadPath, verbose_name="头像")
+    head_image_url = models.URLField(verbose_name="头像URL")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.nickname}"
+    
+    class Meta:
+        verbose_name = "微信信息"
+        verbose_name_plural = "微信信息"
+        db_table = "wechat_info"
+        ordering = ["nickname"]
+
+
 # Create your models here.
 class Applicant(models.Model):
     SCHOOL_LABELS = {
@@ -45,6 +68,14 @@ class Applicant(models.Model):
     )
     email = models.EmailField(verbose_name="邮箱")
     
+    wechat_account = models.CharField(max_length=50, verbose_name="微信号")
+    wechat_info = models.OneToOneField(
+        "WeChatInfo",
+        on_delete=models.PROTECT,
+        related_name="applicant",
+        verbose_name="微信信息"
+    )
+    
     payment = models.OneToOneField(
         "PaymentVoucher",
         on_delete=models.PROTECT,
@@ -69,6 +100,7 @@ class Applicant(models.Model):
         db_table = "applicant"
         ordering = ["school", "grade", "name", "created_at"]
     
+    
 class PaymentVoucher(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     assigned_to = models.ForeignKey(
@@ -86,7 +118,9 @@ class PaymentVoucher(models.Model):
         db_table = "payment_voucher"
         ordering = ["assigned_to", "applicant", "created_at"]
 
+
 class Mentor(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=10, verbose_name="姓名")
     wechat = models.CharField(max_length=30, verbose_name="微信号", blank=True, null=True)
     
@@ -203,7 +237,7 @@ class Image(models.Model):
         return f"#{self.task.pair.pair_number}-{self.task.pair.name}  第{self.task.day}天 - {self.image.url}"
     
     class Meta:
-        verbose_name = "图片"
-        verbose_name_plural = "图片"
+        verbose_name = "任务图片"
+        verbose_name_plural = "任务图片"
         db_table = "image"
         ordering = ["task", "created_at"]
