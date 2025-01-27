@@ -1,8 +1,9 @@
 # Triple Uni 2025年一周CP活动
 
 ## 文件结构
- - `./frontend` 前端
+ - `./frontend/website` 前端网页
  - `./backend/server` 后端服务器
+ - `./backend/wechat-oauth` 微信 OAuth2.0 代理
  - `./backend/mathingAlgorithm` 配对算法
 
 ## 业务流程

@@ -5,16 +5,15 @@ from rest_framework.response import Response
 from django.core.files.base import ContentFile
 
 from ..models import WeChatInfo
-from ..serializers.WeChatInfoSerializer import CreateSerializer
-
 
 APP_ID = "wx04ddbc9e6bebf0e5"
 SECRET = "11f812177e08f6e4851e798541820aca"
 
+
 @api_view(["POST"])
 def wechat_oauth(request):
     if "code" not in request.data:
-        return Response({"error": "code not found"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "code not found"}, status=status.HTTP_400_BAD_REQUEST)
     
     code = request.data["code"]
     
@@ -29,7 +28,7 @@ def wechat_oauth(request):
     
     response = requests.get(ACCESS_TOKEN_URL)
     if response.status_code != 200:
-        return Response({"error": "failed to fetch access token"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "failed to fetch access token"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     content = response.json()
     if "errcode" in content:
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
@@ -47,7 +46,7 @@ def wechat_oauth(request):
     
     user_info_response = requests.get(USER_INFO_URL)
     if user_info_response.status_code != 200:
-        return Response({"error": "failed to fetch user info"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "failed to fetch user info"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     user_info_content = user_info_response.json()
     if "errcode" in user_info_content:
         return Response(user_info_content, status=status.HTTP_400_BAD_REQUEST)
@@ -73,20 +72,22 @@ def _saveToModel(openid, nickname, headimgurl):
     # If the user does not exist, proceed to create a new one
     image_file = _fetchImage(openid, headimgurl)
     if not image_file:
-        return Response({"error": "failed to fetch head image"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "failed to fetch head image"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    serializer = CreateSerializer(data={
+    data = {
         "openid": openid,
         "nickname": nickname,
         "head_image": image_file,
         "head_image_url": headimgurl
-    })
-    if serializer.is_valid():
-        serializer.save()
+    }
+    newWeChatInfo = WeChatInfo(**data)
+    
+    try:
+        newWeChatInfo.full_clean()
+        newWeChatInfo.save()
         return Response({"data": {"openid" : openid}}, status=status.HTTP_200_OK)
-    else:
-        return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+    except Exception as e:
+        return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 def _fetchImage(openid, url):

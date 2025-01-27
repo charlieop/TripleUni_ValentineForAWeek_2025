@@ -12,12 +12,15 @@
 
 <script setup>
 // let fromURL = "http://api.charlieop.com:8000";
-let fromURL = "http://192.168.71.85:3000";
+let fromURL = "http://192.168.3.4:3000";
+// let requestURL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=";
+let requestURL = "http://192.168.3.4:5500/";
 
 let appID = "wx04ddbc9e6bebf0e5";
 
 let url =
-  "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" +
+  requestURL + 
+  "?appid=" +
   appID +
   "&redirect_uri=" +
   encodeURIComponent(fromURL) +
@@ -36,16 +39,16 @@ const isWechat = computed(() => {
 const res = ref();
 
 onMounted(() => {
-  if (isWechat.value && !queryParams.code) {
-    window.location.href = url;
-  }
+  // if (isWechat.value && !queryParams.code) {
+  //   window.location.href = url;
+  // }
 
   const code = queryParams.code;
   if (!code) {
     return;
   }
-
-  const result = fetch(`http:///192.168.71.85:8000/api/v1/oauth/wechat`, {
+  res.value = "Code exist, Loading...";
+  const result = fetch(`http:///192.168.3.4:8000/api/v1/oauth/wechat/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
