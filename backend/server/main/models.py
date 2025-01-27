@@ -10,7 +10,10 @@ class WeChatInfo(models.Model):
         modified_filename = '{}.{}'.format(self.openid, ext)
         return f"uploads/wechat-headimg/{modified_filename}"
 
-    openid = models.CharField(max_length=50, primary_key=True, editable=False, verbose_name="OpenID")
+    # XXX: openid is primary key, so it should be unique
+    # openid = models.CharField(max_length=50, primary_key=True, editable=False, verbose_name="OpenID")
+    openid = models.CharField(max_length=50, primary_key=True, verbose_name="OpenID")
+
     nickname = models.CharField(max_length=50, verbose_name="昵称")
     head_image = models.ImageField(upload_to=generateUploadPath, verbose_name="头像")
     head_image_url = models.URLField(verbose_name="头像URL")
@@ -123,10 +126,14 @@ class PaymentVoucher(models.Model):
 
 
 class Mentor(AbstractUser):
+    def generateUploadPath(self, filename):
+        ext = filename.split('.')[-1]
+        modified_filename = '{}.{}'.format(self.id, ext)
+        return f"uploads/mentor-qr-code/{modified_filename}"
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=10, verbose_name="姓名")
     wechat = models.CharField(max_length=30, verbose_name="微信号")
-    wechat_img = models.ImageField(upload_to="uploads/mentor-qr-code/", null=True, blank=True, verbose_name="微信二维码")
+    wechat_qrcode = models.ImageField(upload_to=generateUploadPath, null=True, blank=True, verbose_name="微信二维码")
     
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
@@ -141,27 +148,51 @@ class Mentor(AbstractUser):
         ordering = ["name", "created_at"]
         
 
-class MatchedPair(models.Model):
+class Match(models.Model):
+    ROUNDS = {
+        1: "第一轮",
+        2: "第二轮"
+    }
+    STATUS = {
+        "A": "已接受",
+        "R": "已拒绝",
+        "P": "待确认"
+    }
+    
     id = models.AutoField(primary_key=True, editable=False, verbose_name="组号")
     name = models.CharField(max_length=30, default="取一个组名吧!", verbose_name="组名")
+    
+    round = models.IntegerField(choices=ROUNDS, verbose_name="轮次")
     
     mentor = models.ForeignKey(
         "Mentor",
         on_delete=models.PROTECT,
-        related_name="matched_pairs",
+        related_name="matches",
         verbose_name="负责Mentor"
     )
     applicant1 = models.ForeignKey(
         "Applicant",
         on_delete=models.PROTECT,
-        related_name="matched_pairs_pos1",
+        related_name="+",
         verbose_name="嘉宾1号"
+    )
+    applicant1_status = models.CharField(
+        max_length=1,
+        choices=STATUS,
+        default="P",
+        verbose_name="嘉宾1号状态"
     )
     applicant2 = models.ForeignKey(
         "Applicant",
         on_delete=models.PROTECT,
-        related_name="matched_pairs_pos2",
+        related_name="+",
         verbose_name="嘉宾2号"
+    )
+    applicant2_status = models.CharField(
+        max_length=1,
+        choices=STATUS,
+        default="P",
+        verbose_name="嘉宾2号状态"
     )
     
     discarded = models.BooleanField(default=False, verbose_name="已废弃")
@@ -174,20 +205,20 @@ class MatchedPair(models.Model):
         return f"#{self.id}-{self.name}  | Mentor: {self.mentor.name}"
     
     class Meta:
-        verbose_name = "嘉宾组"
-        verbose_name_plural = "嘉宾组"
-        db_table = "matched_pair"
+        verbose_name = "CP组"
+        verbose_name_plural = "CP组"
+        db_table = "match"
         ordering = ["id"]
 
 
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
-    pair = models.ForeignKey(
-        "MatchedPair",
+    match = models.ForeignKey(
+        "Match",
         on_delete=models.PROTECT,
         related_name="tasks",
-        verbose_name="对应嘉宾组"
+        verbose_name="对应CP组"
     )
     day = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(7)], verbose_name="第X天")
     
@@ -208,20 +239,20 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"第{self.day}天: #{self.pair.id}-{self.pair.name}"
+        return f"第{self.day}天: #{self.match.id}-{self.match.name}"
     
     class Meta:
         verbose_name = "任务"
         verbose_name_plural = "任务"
         db_table = "task"
-        ordering = ["pair", "day"]
+        ordering = ["match", "day"]
 
 
 class Image(models.Model):
     def generateUploadPath(self, filename):
         ext = filename.split('.')[-1]
         modified_filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
-        return f"uploads/tasks/{self.task.pair.id}/day-{self.task.day}/{modified_filename}"
+        return f"uploads/tasks/{self.task.match.id}/day-{self.task.day}/{modified_filename}"
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
@@ -236,7 +267,7 @@ class Image(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     
     def __str__(self):
-        return f"#{self.task.pair.id}-{self.task.pair.name}  第{self.task.day}天 - {self.image.url}"
+        return f"#{self.task.match.id}-{self.task.match.name}  第{self.task.day}天 - {self.image.url}"
     
     class Meta:
         verbose_name = "任务图片"

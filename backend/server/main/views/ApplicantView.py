@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound, ParseError
 from ..mixin import UtilMixin, Conflict, NotFound
 from ..models import Applicant, PaymentVoucher
 from ..serializers.ApplicantSerializer import CreateApplicantSerializer, GetApplicantSerializer
+import uuid
 
 
 """ FOR TESTING PURPOSES
@@ -83,17 +84,21 @@ class ApplicantDepositView(APIView, UtilMixin):
         return Response({"data": {"paid": True}}, status=status.HTTP_200_OK)
     
     def post(self, request, pk):
-        code = request.query_params.get('code')
+        code = request.data.get("code", None)
         if code is None:
             raise ParseError("Query parameter \"code\" is required")
 
         openid = self.get_openid(request)
         applicant = self.get_applicant(pk, openid)
 
+        try:
+            uuid.UUID(code)
+        except ValueError:
+            raise ParseError("The code is not a valid UUID")
         payment = PaymentVoucher.objects.filter(id=code).first()
         if not payment:
             raise NotFound("The payment code does not exist")
-        if payment.applicant is not None:
+        if hasattr(payment, "applicant") and payment.applicant is not None:
             raise Conflict("The payment code has already been redeemed")
 
         applicant.payment = payment

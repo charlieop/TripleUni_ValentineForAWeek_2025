@@ -9,7 +9,6 @@ from ..models import WeChatInfo
 APP_ID = "wx04ddbc9e6bebf0e5"
 SECRET = "11f812177e08f6e4851e798541820aca"
 
-
 @api_view(["POST"])
 def wechat_oauth(request):
     if "code" not in request.data:

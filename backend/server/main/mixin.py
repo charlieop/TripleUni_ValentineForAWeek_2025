@@ -1,6 +1,8 @@
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied, ParseError
+import uuid
 
-from .models import Applicant
+
+from .models import Applicant, Match
 
 class Gone(APIException):
     status_code = 410
@@ -12,6 +14,10 @@ class Conflict(APIException):
     default_detail = "A conflict occurred."
     default_code = "conflict"
 
+class PaymentRequired(APIException):
+    status_code = 402
+    default_detail = "Payment is required to proceed."
+    default_code = "payment_required"
 
 
 class UtilMixin:
@@ -22,13 +28,23 @@ class UtilMixin:
         return openid
 
     def get_applicant(self, pk, openid):
+        try:
+            uuid.UUID(pk)
+        except ValueError:
+            raise ParseError("The code is not a valid UUID")
         applicant = Applicant.objects.filter(id=pk).first()
         if not applicant:
-            raise NotFound("Applicant with the given \"id\" does not exist")
+            raise PermissionDenied("Unauthorized to access this applicant")
         if applicant.quitted:
             raise Gone("Applicant has quitted")
         if applicant.wechat_info.openid != openid:
             raise PermissionDenied("Unauthorized to access this applicant")
         return applicant
-    
-    
+
+    def get_match(self, pk, openid):
+        match = Match.objects.filter(id=pk).first()
+        if not match:
+            raise PermissionDenied("Unauthorized to access this match")
+        if match.applicant1.wechat_info.openid != openid and match.applicant2.wechat_info.openid != openid:
+            raise PermissionDenied("Unauthorized to access this match")
+        return match
