@@ -10,9 +10,12 @@ from ..mixin import UtilMixin
 from ..models import Image
 from ..serializers.ImageSerializer import GetImageSerializer
 
+from ..AppConfig import AppConfig
+
 
 class ImageView(APIView, UtilMixin):
     def get(self, request, pk, day):
+        self.assert_event_started()
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         my_index, me, partner = self.get_match_participants(match, openid)
@@ -29,6 +32,7 @@ class ImageView(APIView, UtilMixin):
 
 
     def post(self, request, pk, day):
+        self.assert_task_open(day)
         if type(request.data) != QueryDict:
             raise ParseError("Field: \"image\" is required in body with multipart/form-data")
         
@@ -65,6 +69,7 @@ class ImageView(APIView, UtilMixin):
 
 class ImageDetailView(APIView, UtilMixin):
     def delete(self, request, pk, day, img_pk):
+        self.assert_task_open(day)
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         my_index, me, partner = self.get_match_participants(match, openid)

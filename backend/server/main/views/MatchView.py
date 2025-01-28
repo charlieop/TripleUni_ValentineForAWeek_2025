@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, PermissionDenied
 from django.db.models import Q
 
 
@@ -10,9 +10,14 @@ from ..models import Match
 from ..serializers.MentorSerializer import GetMentorSerializer
 from ..serializers.WeChatInfoSerializer import GetWeChatInfoSerializer
 
+from ..AppConfig import AppConfig
+
 
 class MatchResultView(APIView, UtilMixin):
     def get(self, request):
+        if not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
+            raise PermissionDenied("Match results are not yet available")
+        
         openid = self.get_openid(request)
         matches = Match.objects.filter(Q(applicant1__wechat_info=openid) |  Q(applicant2__wechat_info=openid))
         if not matches:
@@ -30,7 +35,10 @@ class MatchMentorView(APIView, UtilMixin):
     def get(self, request, pk):
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
+        self.assert_match_results_released(match)
+        self.assert_match_confirm_deadline(match)
         mentor = match.mentor
+        
         serializer = GetMentorSerializer(mentor)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
@@ -38,11 +46,14 @@ class MatchMentorView(APIView, UtilMixin):
 
 class MatchPartnerView(APIView, UtilMixin):
     def get(self, request, pk):
+        if not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
+            raise PermissionDenied("Match results are not yet available")
+        
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
+        self.assert_match_results_released(match)
+        self.assert_match_confirm_deadline(match)
         my_index, me, partner = self.get_match_participants(match, openid)
-        
-        
         if me.payment is None:
             raise PaymentRequired("Deposit payment is required to proceed")
         
@@ -70,9 +81,14 @@ class MatchPartnerView(APIView, UtilMixin):
         
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
+        self.assert_match_results_released(match)
+        self.assert_match_confirm_deadline(match)
+        if match.round == 2:
+            raise PermissionDenied("You cannot Reject to the matched partner in the second round")
+        
         my_index, me, partner = self.get_match_participants(match, openid)
         self.assert_match_auth(match, me)
-        
+                
         my_status = match.applicant1_status if my_index == 1 else match.applicant2_status
         if my_status != "P":
             raise Conflict(f"You have already responded with {my_status}")
@@ -94,6 +110,8 @@ class MatchPartnerView(APIView, UtilMixin):
 
 class MatchDetailView(APIView, UtilMixin):
     def get(self, request, pk):
+        self.assert_event_started()
+
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         my_index, me, partner = self.get_match_participants(match, openid)
@@ -126,6 +144,9 @@ class MatchDetailView(APIView, UtilMixin):
 
 
     def patch(self, request, pk):
+        self.assert_event_started()
+        self.assert_event_not_ended()
+        
         name = str(request.data.get("name", ""))
         if name == "":
             raise ParseError("Query parameter \"name\" is required")

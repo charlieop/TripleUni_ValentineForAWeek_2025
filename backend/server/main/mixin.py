@@ -1,10 +1,11 @@
+from datetime import timedelta
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied, ParseError
 import uuid
 import pickle
 from django.core.cache import cache
 
-
 from .models import Applicant, Match
+from .AppConfig import AppConfig
 
 
 class Gone(APIException):
@@ -131,3 +132,38 @@ class UtilMixin:
         print(f"refreshing cache for task: {task.match.id} day{task.day}")
         KEY = self._get_task_key(task.match, task.day)
         cache.delete(KEY)
+
+
+    def assert_application_deadline(self):
+        if AppConfig.passed(AppConfig.APPLICATION_DEADLINE):
+            raise PermissionDenied("The application deadline has passed")
+
+    def assert_match_results_released(self, match):
+        if match.round == 1 and not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
+            raise PermissionDenied("Match results for first round are not yet available")
+        elif not AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_RELEASE):
+            raise PermissionDenied("Match results for second round are not yet available")
+        
+    def assert_match_confirm_deadline(self, match):
+        if match.round == 1 and AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
+            raise PermissionDenied("The deadline to confirm match results for first round has passed")
+        elif AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
+            raise PermissionDenied("The deadline to confirm match results for second round has passed")
+
+    def assert_event_started(self):
+        if not AppConfig.passed(AppConfig.EVENT_START):
+            raise PermissionDenied("The event has not started yet")
+        
+    def assert_event_not_ended(self):
+        if AppConfig.passed(AppConfig.EVENT_END):
+            raise PermissionDenied("The event has ended")
+        
+    def assert_task_open(self, day):
+        offset_day = day - 1
+        task_start_time = AppConfig.FIRST_TASK_START + timedelta(days=offset_day)
+        task_end_time = AppConfig.FIRST_TASK_DEADLINE + timedelta(days=offset_day)
+        
+        if not AppConfig.passed(task_start_time):
+            raise PermissionDenied(f"The task for day {day} has not started yet")
+        if AppConfig.passed(task_end_time):
+            raise PermissionDenied(f"The task for day {day} has ended")

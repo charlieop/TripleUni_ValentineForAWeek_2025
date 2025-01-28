@@ -6,9 +6,12 @@ from rest_framework.exceptions import MethodNotAllowed, ParseError, NotFound
 from ..serializers.TaskSerializer import GetTaskSerializer, CreateTaskSerializer
 from ..mixin import UtilMixin
 
+from ..AppConfig import AppConfig
+
 
 class TaskDetailView(APIView, UtilMixin):
     def get(self, request, pk, day):
+        self.assert_event_started()
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         my_index, me, partner = self.get_match_participants(match, openid)
@@ -23,6 +26,7 @@ class TaskDetailView(APIView, UtilMixin):
 
 
     def post(self, request, pk, day):
+        self.assert_task_open(day)
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         my_index, me, partner = self.get_match_participants(match, openid)
@@ -45,6 +49,7 @@ class TaskDetailView(APIView, UtilMixin):
 
 
     def patch(self, request, pk, day):
+        self.assert_task_open(day)
         submit_text = request.data.get("submit_text", None)
         if submit_text is None:
             raise ParseError("Field: \"submit_text\" is required in body")
