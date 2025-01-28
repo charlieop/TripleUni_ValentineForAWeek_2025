@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from django.core.exceptions import ValidationError
 
 class WeChatInfo(models.Model):
     def generateUploadPath(self, filename):
@@ -251,8 +251,17 @@ class Task(models.Model):
 class Image(models.Model):
     def generateUploadPath(self, filename):
         ext = filename.split('.')[-1]
-        modified_filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
+        modified_filename = '{}.{}'.format(self.id, ext)
         return f"uploads/tasks/{self.task.match.id}/day-{self.task.day}/{modified_filename}"
+    
+    def check_image(value):
+        SIZE_LIMIT = 5 * 1024 * 1024
+        if value.size > SIZE_LIMIT:
+            raise ValidationError('File too large. Size should not exceed 5 MiB.')
+        valid_mime_types = ['image/jpeg', 'image/png', 'image/jpg', 'image/heic']
+        file_mime_type = value.file.content_type
+        if file_mime_type not in valid_mime_types:
+            raise ValidationError('Unsupported file type. Only JPEG, PNG, JPG and HEIC are allowed.')
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
@@ -262,8 +271,9 @@ class Image(models.Model):
         related_name="imgs",
         verbose_name="对应任务"
     )
-    image = models.ImageField(upload_to=generateUploadPath, verbose_name="图片")
+    image = models.ImageField(upload_to=generateUploadPath, validators=[check_image], verbose_name="图片")
     
+    deleted = models.BooleanField(default=False, verbose_name="已删除")
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     
     def __str__(self):

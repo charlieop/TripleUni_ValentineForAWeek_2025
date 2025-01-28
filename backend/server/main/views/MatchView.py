@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import PermissionDenied, ParseError
+from rest_framework.exceptions import ParseError
 from django.db.models import Q
 
 
@@ -40,10 +40,8 @@ class MatchPartnerView(APIView, UtilMixin):
     def get(self, request, pk):
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
+        my_index, me, partner = self.get_match_participants(match, openid)
         
-        my_index = 1 if match.applicant1.wechat_info.openid == openid else 2
-        me = match.applicant1 if my_index == 1 else match.applicant2
-        partner = match.applicant2 if my_index == 1 else match.applicant1
         
         if me.payment is None:
             raise PaymentRequired("Deposit payment is required to proceed")
@@ -72,17 +70,12 @@ class MatchPartnerView(APIView, UtilMixin):
         
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
+        my_index, me, partner = self.get_match_participants(match, openid)
+        self.assert_match_auth(match, me)
         
-        my_index = 1 if match.applicant1.wechat_info.openid == openid else 2
-        me = match.applicant1 if my_index == 1 else match.applicant2
         my_status = match.applicant1_status if my_index == 1 else match.applicant2_status
-        if me.payment is None:
-            raise PaymentRequired("Deposit payment is required to proceed")
-        if match.discarded:
-            raise PermissionDenied(f"Match has already been discarded due to: {match.discard_reason or 'Unknown'}")
         if my_status != "P":
             raise Conflict(f"You have already responded with {my_status}")
-        
         
         if my_index == 1:
             match.applicant1_status = "A" if action == "A" else "R"
@@ -102,31 +95,24 @@ class MatchDetailView(APIView, UtilMixin):
     def get(self, request, pk):
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
-        
-        my_index = 1 if match.applicant1.wechat_info.openid == openid else 2
-        me = match.applicant1 if my_index == 1 else match.applicant2
-        partner = match.applicant2 if my_index == 1 else match.applicant1
-        
-        if me.payment is None:
-            raise PaymentRequired("Deposit payment is required to proceed")
-        if match.discarded:
-            raise PermissionDenied(f"Match has already been discarded due to: {match.discard_reason or 'Unknown'}")
+        my_index, me, partner = self.get_match_participants(match, openid)
+        self.assert_match_auth(match, me)
         
         tasks = []
         total_score = 0
         
-        if hasattr(match, "tasks"):
-            for task in match.tasks.all().order_by("day"):
-                tasks.append({
-                    "day": task.day,
-                    "completed": task.basic_completed,
-                    "basic_score": task.basic_score,
-                    "bonus_score": task.bonus_score,
-                    "daily_score": task.daily_score,
-                })
-                total_score += task.basic_score or 0
-                total_score += task.bonus_score or 0
-                total_score += task.daily_score or 0
+        for task in match.tasks.all().order_by("day"):
+            tasks.append({
+                "day": task.day,
+                "completed": task.basic_completed,
+                "basic_score": task.basic_score,
+                "bonus_score": task.bonus_score,
+                "daily_score": task.daily_score,
+            })
+            total_score += task.basic_score or 0
+            total_score += task.bonus_score or 0
+            total_score += task.daily_score or 0
+        
         return_data = {
             "my_info": GetWeChatInfoSerializer(me.wechat_info).data,
             "partner_info": GetWeChatInfoSerializer(partner.wechat_info).data,
@@ -144,17 +130,12 @@ class MatchDetailView(APIView, UtilMixin):
             raise ParseError("Name must be less than 30 characters")
         if len(name) < 1:
             raise ParseError("Name must be more than 1 characters")
+        
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
+        my_index, me, partner = self.get_match_participants(match, openid)
+        self.assert_match_auth(match, me)
         
-        my_index = 1 if match.applicant1.wechat_info.openid == openid else 2
-        me = match.applicant1 if my_index == 1 else match.applicant2
-        
-        if me.payment is None:
-            raise PaymentRequired("Deposit payment is required to proceed")
-        if match.discarded:
-            raise PermissionDenied(f"Match has already been discarded due to: {match.discard_reason or 'Unknown'}")
-    
         match.name = name
         match.save()
         return Response({"msg": "Match updated"}, status=status.HTTP_200_OK)
