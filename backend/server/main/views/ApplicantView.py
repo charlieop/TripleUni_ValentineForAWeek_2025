@@ -84,6 +84,9 @@ class ApplicantDepositView(APIView, UtilMixin):
 
         openid = self.get_openid(request)
         applicant = self.get_applicant(pk, openid)
+        
+        if applicant.payment is not None:
+            raise Conflict("The applicant has already paid the deposit")
 
         try:
             uuid.UUID(code)

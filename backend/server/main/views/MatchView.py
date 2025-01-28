@@ -62,7 +62,7 @@ class MatchPartnerView(APIView, UtilMixin):
         action = request.data.get("action", None)
         if action is None:
             raise ParseError(
-                "Query parameter \"action\" is required "
+                "Body field \"action\" is required "
                 "with value \"A\" for Accept or \"R\" for reject"
             )
         if action not in ["A", "R"]:
@@ -87,7 +87,7 @@ class MatchPartnerView(APIView, UtilMixin):
             match.discard_reason = f"Rejected by { me.wechat_info.nickname }"
         
         match.save()
-        self.clear_match_cache(match)
+        self.refresh_match_cache(match)
         return Response({"msg": "Match updated"}, status=status.HTTP_200_OK)
 
 
@@ -115,23 +115,24 @@ class MatchDetailView(APIView, UtilMixin):
             total_score += task.daily_score or 0
         
         return_data = {
+            "name": match.name,
             "my_info": GetWeChatInfoSerializer(me.wechat_info).data,
             "partner_info": GetWeChatInfoSerializer(partner.wechat_info).data,
             "partner_wechat_account": partner.wechat_account,
             "tasks": tasks,
-            "total_score": total_score
+            "total_score": total_score,
         }
         return Response({"data": return_data}, status=status.HTTP_200_OK)
 
 
     def patch(self, request, pk):
-        name = str(request.data.get("name", None))
-        if name is None:
+        name = str(request.data.get("name", ""))
+        if name == "":
             raise ParseError("Query parameter \"name\" is required")
         if len(name) > 30:
             raise ParseError("Name must be less than 30 characters")
-        if len(name) < 1:
-            raise ParseError("Name must be more than 1 characters")
+        if len(name) < 2:
+            raise ParseError("Name must be more than 2 characters")
         
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
@@ -140,5 +141,5 @@ class MatchDetailView(APIView, UtilMixin):
         
         match.name = name
         match.save()
-        self.clear_match_cache(match)
+        self.refresh_match_cache(match)
         return Response({"msg": "Match updated"}, status=status.HTTP_200_OK)

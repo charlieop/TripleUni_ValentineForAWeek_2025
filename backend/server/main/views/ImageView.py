@@ -50,6 +50,7 @@ class ImageView(APIView, UtilMixin):
         if task is None:
             raise NotFound(f"No Task exist for day {day}")
         
+        self.refresh_task_cache(task)
         for img in images:
             data = {
                 "task": task,
@@ -57,6 +58,7 @@ class ImageView(APIView, UtilMixin):
             }
             image = Image.objects.create(**data)
             image.save()
+        
         return Response({"msg": "Image uploaded"}, status=status.HTTP_201_CREATED)
 
 
@@ -75,7 +77,7 @@ class ImageDetailView(APIView, UtilMixin):
         image = task.imgs.filter(id=img_pk).first()
         if not image or image.deleted:
             raise NotFound("Image of this ID does not exist")
-        print(image)
         image.deleted = True
         image.save()
+        self.refresh_task_cache(task)
         return Response({"msg": "Image deleted"}, status=status.HTTP_204_NO_CONTENT)
