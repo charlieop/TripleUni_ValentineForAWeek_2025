@@ -87,7 +87,7 @@ def _saveToModel(openid, nickname, headimgurl):
         return Response({"data": {"openid" : openid}}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
 
 def _fetchImage(openid, url):
     image_response = requests.get(url)

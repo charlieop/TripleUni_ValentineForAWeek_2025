@@ -9,20 +9,6 @@ from ..serializers.ApplicantSerializer import CreateApplicantSerializer, GetAppl
 import uuid
 
 
-""" FOR TESTING PURPOSES
-"openid":"ocuJM7I1DSEuJI036h4_teUBbJwk"
-
-{
-    "name": "test",
-    "sex": "M",
-    "grade": "UG3",
-    "school": "UST",
-    "email": "123@aa.com",
-    "wechat_account": "testla",
-}
-"""
-
-
 class ApplicantView(APIView, UtilMixin):
     def get(self, request):
         openid = self.get_openid(request)
@@ -31,6 +17,7 @@ class ApplicantView(APIView, UtilMixin):
             return Response({"error": "Applicant with the given \"openid\" does not exist"},
                             status=status.HTTP_204_NO_CONTENT)
         return Response({"data": {"id": applicant.id}}, status=status.HTTP_200_OK)
+
 
     def post(self, request):
         openid = self.get_openid(request)
@@ -45,12 +32,14 @@ class ApplicantView(APIView, UtilMixin):
         return Response({"data": {"id": serializer.instance.id}}, status=status.HTTP_201_CREATED)
 
 
+
 class ApplicantDetailView(APIView, UtilMixin):
     def get(self, request, pk):
         openid = self.get_openid(request)
         applicant = self.get_applicant(pk, openid)
         serializer = GetApplicantSerializer(applicant)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+
 
     def patch(self, request, pk):
         openid = self.get_openid(request)
@@ -64,7 +53,9 @@ class ApplicantDetailView(APIView, UtilMixin):
         serializer = CreateApplicantSerializer(applicant, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        self.refresh_applicant_cache(applicant)
         return Response({"msg": "Applicant updated"}, status=status.HTTP_200_OK)
+
 
     def delete(self, request, pk):
         openid = self.get_openid(request)
@@ -72,7 +63,9 @@ class ApplicantDetailView(APIView, UtilMixin):
         
         applicant.quitted = True
         applicant.save()
+        self.refresh_applicant_cache(applicant)
         return Response({"msg": "Applicant quitted"}, status=status.HTTP_204_NO_CONTENT)
+
 
 
 class ApplicantDepositView(APIView, UtilMixin):
@@ -82,7 +75,8 @@ class ApplicantDepositView(APIView, UtilMixin):
         if applicant.payment is None:
             return Response({"data": {"paid": False}}, status=status.HTTP_200_OK)
         return Response({"data": {"paid": True}}, status=status.HTTP_200_OK)
-    
+
+
     def post(self, request, pk):
         code = request.data.get("code", None)
         if code is None:
@@ -103,5 +97,5 @@ class ApplicantDepositView(APIView, UtilMixin):
 
         applicant.payment = payment
         applicant.save()
+        self.refresh_applicant_cache(applicant)
         return Response({"msg": "Deposit paid successfully"}, status=status.HTTP_200_OK)
-    

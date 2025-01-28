@@ -87,6 +87,7 @@ class MatchPartnerView(APIView, UtilMixin):
             match.discard_reason = f"Rejected by { me.wechat_info.nickname }"
         
         match.save()
+        self.clear_match_cache(match)
         return Response({"msg": "Match updated"}, status=status.HTTP_200_OK)
 
 
@@ -121,7 +122,8 @@ class MatchDetailView(APIView, UtilMixin):
             "total_score": total_score
         }
         return Response({"data": return_data}, status=status.HTTP_200_OK)
-    
+
+
     def patch(self, request, pk):
         name = str(request.data.get("name", None))
         if name is None:
@@ -138,7 +140,5 @@ class MatchDetailView(APIView, UtilMixin):
         
         match.name = name
         match.save()
+        self.clear_match_cache(match)
         return Response({"msg": "Match updated"}, status=status.HTTP_200_OK)
-    
-    
-

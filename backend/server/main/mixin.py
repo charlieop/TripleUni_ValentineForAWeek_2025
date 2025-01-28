@@ -43,6 +43,10 @@ class UtilMixin:
         if applicant.wechat_info.openid != openid:
             raise PermissionDenied("Unauthorized to access this applicant")
         return applicant
+    
+    
+    def refresh_applicant_cache(self, applicant):
+        pass
 
 
     def get_match(self, pk, openid):
@@ -52,6 +56,10 @@ class UtilMixin:
         if match.applicant1.wechat_info.openid != openid and match.applicant2.wechat_info.openid != openid:
             raise PermissionDenied("Unauthorized to access this match")
         return match
+    
+    
+    def refresh_match_cache(self, match):
+        pass
     
     
     def get_match_participants(self, match, openid):
@@ -70,3 +78,7 @@ class UtilMixin:
 
     def get_task(self, match, day):
         return match.tasks.filter(day=day).first()
+    
+    
+    def refresh_task_cache(self, task):
+        pass

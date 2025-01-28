@@ -26,8 +26,8 @@ class ImageView(APIView, UtilMixin):
         serializer = GetImageSerializer(imgs, many=True)
         
         return Response({"data": {"imgs": serializer.data}}, status=status.HTTP_200_OK)
-    
-    
+
+
     def post(self, request, pk, day):
         if type(request.data) != QueryDict:
             raise ParseError("Field: \"image\" is required in body with multipart/form-data")
@@ -58,6 +58,7 @@ class ImageView(APIView, UtilMixin):
             image = Image.objects.create(**data)
             image.save()
         return Response({"msg": "Image uploaded"}, status=status.HTTP_201_CREATED)
+
 
 
 class ImageDetailView(APIView, UtilMixin):

@@ -20,8 +20,8 @@ class TaskDetailView(APIView, UtilMixin):
         
         serializer = GetTaskSerializer(task)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
-    
-    
+
+
     def post(self, request, pk, day):
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
@@ -42,8 +42,8 @@ class TaskDetailView(APIView, UtilMixin):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"msg": f"Task created for day {day}"}, status=status.HTTP_201_CREATED)
-    
-    
+
+
     def patch(self, request, pk, day):
         submit_text = request.data.get("submit_text", None)
         if submit_text is None:
@@ -64,4 +64,5 @@ class TaskDetailView(APIView, UtilMixin):
         serializer = CreateTaskSerializer(task, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        self.refresh_task_cache(task)
         return Response({"msg": f"Task updated for day {day}"}, status=status.HTTP_200_OK)
