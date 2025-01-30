@@ -1,5 +1,9 @@
-const API_URL = "http://api.charlieop.com/api/v1/";
-const CONFIG_URL = "http://api.charlieop.com/media/config.json";
+const API_URL = "https://api.charlieop.com/api/v1/";
+const CONFIG_URL = "https://api.charlieop.com/media/config.json";
+// const API_URL = "http://192.168.71.91:8000/api/v1/";
+// const CONFIG_URL = "http://192.168.71.91:8000/media/config.json";
+
+
 
 const { getOpenId } = useStore();
 

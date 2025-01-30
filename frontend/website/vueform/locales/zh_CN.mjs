@@ -52,11 +52,11 @@ export default {
     },
     "steps": {
       "finish": "结束",
-      "next": "下一个",
-      "previous": "以前的"
+      "next": "下一步",
+      "previous": "上一步"
     },
     "editor": {
-      "acceptedMimesError": "接受的哑剧是：:mimes",
+      "acceptedMimesError": "接受的MIME是：:mimes",
       "acceptedExtensionsError": "接受的扩展是：:extensions"
     },
     "datepicker": {
@@ -409,13 +409,13 @@ export default {
     "accepted": "您必须接受 :attribute。",
     "active_url": ":attribute 不是一个有效的网址。",
     "after": ":attribute 必须要晚于 :date。",
-    "after_or_equal": ":attribute 必须要等于 :date 或更晚。",
+    "after_or_equal": ":attribute 必须要不早于 :date。",
     "alpha": ":attribute 只能由字母组成。",
     "alpha_dash": ":attribute 只能由字母、数字、短划线(-)和下划线(_)组成。",
     "alpha_num": ":attribute 只能由字母和数字组成。",
     "array": ":attribute 必须是一个数组。",
     "before": ":attribute 必须要早于 :date。",
-    "before_or_equal": ":attribute 必须要等于 :date 或更早。",
+    "before_or_equal": ":attribute 必须要不晚于 :date。",
     "between": {
       "numeric": ":attribute 必须介于 :min - :max 之间。",
       "file": ":attribute 必须介于 :min - :max KB 之间。",
