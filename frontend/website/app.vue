@@ -13,18 +13,22 @@
 
     <UNotifications />
     <UModals />
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ModalRequireWeChat } from "#components";
-
+const { fetchConfig } = useHttp();
+const { setConfig } = useReactive();
 const displayScreenSizeWarning = ref(false);
 
 onMounted(() => {
   if (window.innerWidth < 375 || window.innerHeight < 650) {
     displayScreenSizeWarning.value = true;
   }
+  fetchConfig().then((config) => {
+    setConfig(config);
+  });
 });
 </script>
 
@@ -40,7 +44,8 @@ onMounted(() => {
 
 .app {
   background-color: var(--clr-background);
-  width: var(--width);
-  height: var(--height);
+  height: 100%;
+  width: 100%;
+  max-width: var(--max-width);
 }
 </style>

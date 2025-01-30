@@ -17,11 +17,16 @@ export default defineNuxtConfig({
   app: {
     baseURL: "/",
     head: {
-      title: "Triple UNI 2025 一周CP",
-      viewport: 'width=device-width, initial-scale=1',
+      title: "一周CP 2025",
+      viewport:
+        "width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover",
       link: [
-        { rel: "icon", type: "image/x-icon", href: "https://tripleuni.com/img/logo-512.461b29bd.png" },
-      ]
-    }
+        {
+          rel: "icon",
+          type: "image/x-icon",
+          href: "https://tripleuni.com/img/logo-512.461b29bd.png",
+        },
+      ],
+    },
   },
 });

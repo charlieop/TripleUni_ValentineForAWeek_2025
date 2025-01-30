@@ -2,6 +2,8 @@
   <UModal
     :ui="{
       padding: 'p-0 sm:p-0',
+      margin: 'my-0 sm:my-0',
+      width: '',
       container: 'items-center',
       overlay: {
         background: 'bg-gray-700/90 dark:bg-gray-900/90',
@@ -14,11 +16,15 @@
     <div class="loading-wrapper">
       <div class="logo">
         <img
-          src="/imgs/logo-w.webp"
+          :src="IMAGE_BASE_URL + 'logo-w.webp'"
           alt="Valentine For A Week Logo"
           v-if="!isDarkMode"
         />
-        <img src="/imgs/logo-p.webp" alt="Valentine For A Week Logo" v-else />
+        <img
+          :src="IMAGE_BASE_URL + 'logo-p.webp'"
+          alt="Valentine For A Week Logo"
+          v-else
+        />
       </div>
       <h3>
         {{ text || "正在联系月老" }}
@@ -64,7 +70,7 @@
         </div>
       </div>
       <div class="decor-couple">
-        <img src="/imgs/couple2.webp" alt="" />
+        <img :src="IMAGE_BASE_URL + 'couple2.webp'" alt="" />
       </div>
     </div>
   </UModal>
@@ -80,15 +86,15 @@ const text = ref(props.text);
 
 <style scoped>
 .loading-wrapper {
-  width: var(--width);
   height: var(--height);
+  max-width: var(--max-width);
+  /* background-color: red; */
+  padding: 0.5rem 1rem;
   position: relative;
   overflow: hidden;
 }
 .logo img {
-  margin-top: 1rem;
   margin-inline: auto;
-  width: 80%;
   transform: translateX(-2%);
 }
 h3 {

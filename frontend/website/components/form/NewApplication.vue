@@ -825,10 +825,10 @@
         />
         <CheckboxElement
           name="confirm2"
-          field-name="无法重新提交"
+          field-name="重新提交须知"
           :submit="false"
           :rules="['accepted']"
-          text="我只能提交一次申请, 提交后我将无法取消/ 更改/ 重新提交申请"
+          text="我的申请将会与我的微信绑定, 在申请截止前我可以随时修改我的申请, 只有最新的提交会被保存. 一旦申请截止, 我将不能再次修改我的申请."
         />
         <StaticElement name="divider_8" tag="hr" top="2" />
       </FormElements>

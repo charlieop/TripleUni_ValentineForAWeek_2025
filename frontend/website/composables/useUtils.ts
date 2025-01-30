@@ -17,3 +17,6 @@ window
   .addEventListener("change", (e) => {
     isDarkMode.value = e.matches;
   });
+
+
+export const IMAGE_BASE_URL = "https://i.boatonland.com/valentine/2025/"

@@ -16,9 +16,9 @@ a:visited {
   color: inherit;
   text-decoration: none;
 }
-a:hover {
+/* a:hover {
   text-decoration: underline;
-}
+} */
 
 ol,
 ul {
