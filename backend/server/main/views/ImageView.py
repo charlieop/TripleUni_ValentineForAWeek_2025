@@ -23,7 +23,7 @@ class ImageView(APIView, UtilMixin):
 
         task = self.get_task(match, day)
         if task is None:
-            raise NotFound(f"No Task exist for day {day}")
+            raise NotFound(f"找不到第{day}天的任务")
         
         imgs = task.imgs.filter(deleted=False).all()
         serializer = GetImageSerializer(imgs, many=True)
@@ -39,11 +39,11 @@ class ImageView(APIView, UtilMixin):
         images = request.data.getlist("images", [])
         for img in images:
             if type(img) not in [InMemoryUploadedFile, TemporaryUploadedFile]:
-                raise UnsupportedMediaType("Field: \"image\" should only contain images")
+                raise UnsupportedMediaType("上传的内容中包含非图片内容")
             if img.content_type not in ['image/jpeg', 'image/png', 'image/jpg', 'image/heic']:
-                raise UnsupportedMediaType("Unsupported file type, only JPEG, PNG, JPG and HEIC are allowed")
+                raise UnsupportedMediaType("不支持的图片格式, 只支持JPEG, PNG, JPG, HEIC")
             if img.size > 5 * 1024 * 1024:
-                raise ParseError('File too large, each image size should not exceed 5 MiB')
+                raise ParseError('文件过大, 请保证图片大小在5MB以内')
         
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
@@ -52,7 +52,7 @@ class ImageView(APIView, UtilMixin):
         
         task = self.get_task(match, day)
         if task is None:
-            raise NotFound(f"No Task exist for day {day}")
+            raise NotFound(f"找不到第{day}天的任务")
         
         self.refresh_task_cache(task)
         for img in images:
@@ -63,7 +63,7 @@ class ImageView(APIView, UtilMixin):
             image = Image.objects.create(**data)
             image.save()
         
-        return Response({"msg": "Image uploaded"}, status=status.HTTP_201_CREATED)
+        return Response({"msg": "图片上传成功"}, status=status.HTTP_201_CREATED)
 
 
 
@@ -77,12 +77,12 @@ class ImageDetailView(APIView, UtilMixin):
         
         task = self.get_task(match, day)
         if task is None:
-            raise NotFound(f"No Task exist for day {day}")
+            raise NotFound(f"找不到第{day}天的任务")
         
         image = task.imgs.filter(id=img_pk).first()
         if not image or image.deleted:
-            raise NotFound("Image of this ID does not exist")
+            raise NotFound("找不到此ID对应的图片")
         image.deleted = True
         image.save()
         self.refresh_task_cache(task)
-        return Response({"msg": "Image deleted"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"msg": "图片删除成功"}, status=status.HTTP_204_NO_CONTENT)

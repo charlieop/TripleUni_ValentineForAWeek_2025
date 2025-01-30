@@ -6,7 +6,7 @@ import json
 class AppConfig():
     CONFIG_SAVE_PATH = settings.MEDIA_ROOT / "config.json"
     
-    DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+    DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
 
     APPLICATION_DEADLINE = datetime(year=2025, month=2, day=4, hour=12, minute=00, second=00)
 

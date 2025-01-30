@@ -46,31 +46,28 @@ class UtilMixin:
         try:
             uuid.UUID(pk)
         except ValueError:
-            raise ParseError("The code is not a valid UUID")
+            raise ParseError("输入的申请人ID格式不正确")
         
         KEY = self._get_applicant_key(pk)
         cached_applicant = cache.get(KEY)
         
         if cached_applicant:
-            print(f"cache hit for applicant: {pk}")
             applicant = pickle.loads(cached_applicant)
         else:
-            print(f"cache miss for applicant: {pk}")
             applicant = Applicant.objects.filter(id=pk).first()
             if not applicant:
-                raise PermissionDenied("Unauthorized to access this applicant")
+                raise PermissionDenied("你无权访问此申请者")
             pickled = pickle.dumps(applicant)
             cache.set(KEY, pickled)
             
         if applicant.quitted:
-            raise Gone("Applicant has quitted")
+            raise Gone("申请者已经退出")
         if applicant.wechat_info.openid != openid:
-            raise PermissionDenied("Unauthorized to access this applicant")
+            raise PermissionDenied("你无权访问此申请者")
         
         return applicant
     
     def refresh_applicant_cache(self, applicant):
-        print(f"refreshing cache for applicant: {applicant.id}")
         KEY = self._get_applicant_key(applicant.id)
         cache.delete(KEY)
 
@@ -79,22 +76,19 @@ class UtilMixin:
         KEY = self._get_match_key(pk)
         cached_match = cache.get(KEY)
         if cached_match:
-            print(f"cache hit for match: {pk}")
             match = pickle.loads(cached_match)
         else:
-            print(f"cache miss for match: {pk}")
             match = Match.objects.filter(id=pk).first()
             if not match:
-                raise PermissionDenied("Unauthorized to access this match")
+                raise PermissionDenied("你无权访问此配对")
             pickled = pickle.dumps(match)
             cache.set(KEY, pickled)
         
         if match.applicant1.wechat_info.openid != openid and match.applicant2.wechat_info.openid != openid:
-            raise PermissionDenied("Unauthorized to access this match")
+                raise PermissionDenied("你无权访问此配对")
         return match
     
     def refresh_match_cache(self, match):
-        print(f"refreshing cache for match: {match.id}")
         KEY = self._get_match_key(match.id)
         cache.delete(KEY)
     
@@ -108,9 +102,9 @@ class UtilMixin:
 
     def assert_match_auth(self, match, me):
         if me.payment is None:
-            raise PaymentRequired("Deposit payment is required to proceed")
+            raise PaymentRequired("你需要支付押金才能继续")
         if match.discarded:
-            raise PermissionDenied(f"Match has already been discarded due to: {match.discard_reason or 'Unknown'}")
+            raise PermissionDenied(f"此配对已经作废, 原因是: {match.discard_reason or '未知'}")
 
 
     def get_task(self, match, day):
@@ -118,10 +112,8 @@ class UtilMixin:
         cached_task = cache.get(KEY)
         
         if cached_task:
-            print(f"cache hit for task: {match.id} day{day}")
             task = pickle.loads(cached_task)
         else:
-            print(f"cache miss for task: {match.id} day{day}")
             task = match.tasks.filter(day=day).first()
             if task:
                 cache.set(KEY, pickle.dumps(task))
@@ -129,34 +121,33 @@ class UtilMixin:
         return task
     
     def refresh_task_cache(self, task):
-        print(f"refreshing cache for task: {task.match.id} day{task.day}")
         KEY = self._get_task_key(task.match, task.day)
         cache.delete(KEY)
 
 
     def assert_application_deadline(self):
         if AppConfig.passed(AppConfig.APPLICATION_DEADLINE):
-            raise PermissionDenied("The application deadline has passed")
+            raise PermissionDenied("提交申请DDL已过, 明年再来吧")
 
     def assert_match_results_released(self, match):
         if match.round == 1 and not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
-            raise PermissionDenied("Match results for first round are not yet available")
+            raise PermissionDenied("第一轮的匹配结果暂未公布")
         elif not AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_RELEASE):
-            raise PermissionDenied("Match results for second round are not yet available")
+            raise PermissionDenied("第二轮的匹配结果暂未公布")
         
     def assert_match_confirm_deadline(self, match):
         if match.round == 1 and AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
-            raise PermissionDenied("The deadline to confirm match results for first round has passed")
+            raise PermissionDenied("第一轮的押金缴纳DDL已过")
         elif AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
-            raise PermissionDenied("The deadline to confirm match results for second round has passed")
+            raise PermissionDenied("第二轮的押金缴纳DDL已过")
 
     def assert_event_started(self):
         if not AppConfig.passed(AppConfig.EVENT_START):
-            raise PermissionDenied("The event has not started yet")
+            raise PermissionDenied("活动还未开始")
         
     def assert_event_not_ended(self):
         if AppConfig.passed(AppConfig.EVENT_END):
-            raise PermissionDenied("The event has ended")
+            raise PermissionDenied("活动已经结束")
         
     def assert_task_open(self, day):
         offset_day = day - 1
@@ -164,6 +155,6 @@ class UtilMixin:
         task_end_time = AppConfig.FIRST_TASK_DEADLINE + timedelta(days=offset_day)
         
         if not AppConfig.passed(task_start_time):
-            raise PermissionDenied(f"The task for day {day} has not started yet")
+            raise PermissionDenied(f"第{day}天的任务还未开始")
         if AppConfig.passed(task_end_time):
-            raise PermissionDenied(f"The task for day {day} has ended")
+            raise PermissionDenied(f"第{day}天的任务已经结束")

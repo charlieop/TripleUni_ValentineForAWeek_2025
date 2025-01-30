@@ -21,20 +21,20 @@ def format_applicant_data(raw, openid):
     email = data.get("email", None)
     school = data.get("school", None)
     if school is None or email is None:
-        raise ParseError("School and email are required")
+        raise ParseError("你的学校和邮箱是必填项")
     if school == "UST":
         if not email.endswith("@connect.ust.hk"):
-            raise ParseError("The email is not a valid UST email")
+            raise ParseError("你提供的邮箱不是一个HKUST邮箱")
     elif school == "HKU":
         if not email.endswith("@connect.hku.hk"):
-            raise ParseError("The email is not a valid HKU email")
+            raise ParseError("你提供的邮箱不是一个HKU邮箱")
     elif school == "CUHK":
         if not email.endswith("@link.cuhk.edu.hk"):
-            raise ParseError("The email is not a valid CUHK email")
+            raise ParseError("你提供的邮箱不是一个CUHK邮箱")
     
     hobbies = data.pop("hobbies", [])
     if len(hobbies) > 3:
-        raise ParseError("The number of hobbies should not exceed 3")
+        raise ParseError("兴趣爱好数量不能超过3个")
     for i, hobby in enumerate(hobbies):
         data[f"hobby{i+1}"] = hobby
         
@@ -84,7 +84,7 @@ class ApplicantView(APIView, UtilMixin):
         openid = self.get_openid(request)
         applicant = Applicant.objects.filter(wechat_info=openid).first()
         if not applicant:
-            return Response({"msg": "Applicant with the given \"openid\" does not exist"},
+            return Response({"msg": "找不到此OpenId对应的申请者"},
                             status=status.HTTP_204_NO_CONTENT)
         return Response({"data": {"id": applicant.id}}, status=status.HTTP_200_OK)
 
@@ -125,7 +125,7 @@ class ApplicantDetailView(APIView, UtilMixin):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         self.refresh_applicant_cache(applicant)
-        return Response({"msg": "Applicant updated"}, status=status.HTTP_200_OK)
+        return Response({"msg": "申请者信息更新成功"}, status=status.HTTP_200_OK)
 
 
     def delete(self, request, pk):
@@ -137,7 +137,7 @@ class ApplicantDetailView(APIView, UtilMixin):
         applicant.quitted = True
         applicant.save()
         self.refresh_applicant_cache(applicant)
-        return Response({"msg": "Applicant quitted"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"msg": "已将申请者设为“退出”状态"}, status=status.HTTP_204_NO_CONTENT)
 
 
 
@@ -153,25 +153,25 @@ class ApplicantDepositView(APIView, UtilMixin):
     def post(self, request, pk):
         code = request.data.get("code", None)
         if code is None:
-            raise ParseError("Query parameter \"code\" is required")
+            raise ParseError("无法在请求体中找到参数”code“")
 
         openid = self.get_openid(request)
         applicant = self.get_applicant(pk, openid)
         
         if applicant.payment is not None:
-            raise Conflict("The applicant has already paid the deposit")
+            raise Conflict("申请者已经支付了押金")
 
         try:
             uuid.UUID(code)
         except ValueError:
-            raise ParseError("The code is not a valid UUID")
+            raise ParseError("填写的兑换码格式不正确")
         payment = PaymentVoucher.objects.filter(id=code).first()
         if not payment:
-            raise NotFound("The payment code does not exist")
+            raise NotFound("此兑换码不存在")
         if hasattr(payment, "applicant") and payment.applicant is not None:
-            raise Conflict("The payment code has already been redeemed")
+            raise Conflict("此兑换码已经被使用")
 
         applicant.payment = payment
         applicant.save()
         self.refresh_applicant_cache(applicant)
-        return Response({"msg": "Deposit paid successfully"}, status=status.HTTP_200_OK)
+        return Response({"msg": "押金缴付验证成功"}, status=status.HTTP_200_OK)

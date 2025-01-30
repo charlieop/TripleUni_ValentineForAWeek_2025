@@ -22,7 +22,7 @@ class MissionView(APIView, UtilMixin):
         
         missions = Mission.objects.filter(day=days_passed).first()
         if missions is None:
-            return Response("Cannot find the corrsponding mission", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(f"找不到第{days_passed}天的任务", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         serializer = GetMissionSerializer(missions)
         return Response(serializer.data)
 
@@ -33,6 +33,6 @@ class SecretMissionView(APIView, UtilMixin):
         
         missions = Mission.objects.filter(day=0).first()
         if missions is None:
-            return Response("Cannot find the corrsponding mission", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response("找不到你的秘密任务", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         serializer = GetMissionSerializer(missions)
         return Response(serializer.data)

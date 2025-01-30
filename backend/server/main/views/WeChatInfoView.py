@@ -28,7 +28,7 @@ def wechat_oauth(request):
     
     response = requests.get(ACCESS_TOKEN_URL)
     if response.status_code != 200:
-        return Response({"detail": "failed to fetch access token"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "找不到Access Token"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     content = response.json()
     if "errcode" in content:
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
@@ -48,7 +48,7 @@ def wechat_oauth(request):
     
     user_info_response = requests.get(USER_INFO_URL)
     if user_info_response.status_code != 200:
-        return Response({"detail": "failed to fetch user info"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "找不到用户信息"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     user_info_content = user_info_response.json()
     if "errcode" in user_info_content:
         return Response(user_info_content, status=status.HTTP_400_BAD_REQUEST)
@@ -74,7 +74,7 @@ def _saveToModel(openid, nickname, headimgurl):
     # If the user does not exist, proceed to create a new one
     image_file = _fetchImage(openid, headimgurl)
     if not image_file:
-        return Response({"detail": "failed to fetch head image"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "下载头像失败"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     data = {
         "openid": openid,

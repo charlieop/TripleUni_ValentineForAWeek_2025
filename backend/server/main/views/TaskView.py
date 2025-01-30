@@ -19,7 +19,7 @@ class TaskDetailView(APIView, UtilMixin):
         task = self.get_task(match, day)
         
         if task is None:
-            return Response({"msg": f"No Task found for day {day}"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"msg": f"找不到第{day}天的任务提交"}, status=status.HTTP_204_NO_CONTENT)
         
         serializer = GetTaskSerializer(task)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
@@ -34,7 +34,7 @@ class TaskDetailView(APIView, UtilMixin):
 
         task = self.get_task(match, day)
         if task is not None:
-            raise MethodNotAllowed(f"Task already exists for day {day}, use PATCH to update")
+            raise MethodNotAllowed(f"第{day}天的任务提交已经存在, 使用 PATCH 来更新")
         
         data = {
             "match": match.id,
@@ -45,14 +45,14 @@ class TaskDetailView(APIView, UtilMixin):
         serializer = CreateTaskSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"msg": f"Task created for day {day}"}, status=status.HTTP_201_CREATED)
+        return Response({"msg": f"第{day}天的任务提交创建成功"}, status=status.HTTP_201_CREATED)
 
 
     def patch(self, request, pk, day):
         self.assert_task_open(day)
         submit_text = request.data.get("submit_text", None)
         if submit_text is None:
-            raise ParseError("Field: \"submit_text\" is required in body")
+            raise ParseError("请求体中需要包含 submit_text 字段")
         
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
@@ -61,7 +61,7 @@ class TaskDetailView(APIView, UtilMixin):
         
         task = self.get_task(match, day)
         if task is None:
-            raise NotFound(f"No Task exist for day {day}, use POST to create")
+            raise NotFound(f"找不到第{day}天的任务提交, 使用 POST 来创建")
 
         data = {
             "submit_text": submit_text
@@ -70,4 +70,4 @@ class TaskDetailView(APIView, UtilMixin):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         self.refresh_task_cache(task)
-        return Response({"msg": f"Task updated for day {day}"}, status=status.HTTP_200_OK)
+        return Response({"msg": f"第{day}天任务更新成功"}, status=status.HTTP_200_OK)
