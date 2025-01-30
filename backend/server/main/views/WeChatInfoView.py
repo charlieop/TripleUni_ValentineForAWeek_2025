@@ -4,11 +4,15 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.files.base import ContentFile
 
+from django.conf import settings
+import json
+
 from ..models import WeChatInfo
 
-APP_ID = "wx04ddbc9e6bebf0e5"
-SECRET = "11f812177e08f6e4851e798541820aca"
-DEFAULT_USER_OPENID = "o7eQY6iIG7GfXDD_4Qm9DbrnQdT0"
+with open(settings.BASE_DIR / "SECRETS.json") as f:
+    secrets = json.load(f)
+    APP_ID = secrets["WECHAT_APP_ID"]
+    SECRET = secrets["WECHAT_APP_SECRET"]
 
 @api_view(["POST"])
 def wechat_oauth(request):
@@ -35,14 +39,12 @@ def wechat_oauth(request):
     
     ACCESS_TOKEN = content["access_token"]
     OPENID = content["openid"]
-    if OPENID == DEFAULT_USER_OPENID:
-        return Response({"data": {"openid" : DEFAULT_USER_OPENID}}, status=status.HTTP_200_OK)
     
     # fetch user info
     USER_INFO_URL = (
         f"https://api.weixin.qq.com/sns/userinfo?"
         f"access_token={ACCESS_TOKEN}&"
-        f"openid={OPENID}"
+        f"openid={OPENID}&"
         f"lang=zh_CN"
     )
     
@@ -55,6 +57,7 @@ def wechat_oauth(request):
     
     NICKNAME = user_info_content["nickname"]
     HEADIMGURL = user_info_content["headimgurl"]
+    print(f"\nopenid: {OPENID}, nickname: {NICKNAME}\n")
     
     return _saveToModel(OPENID, NICKNAME, HEADIMGURL)
 
