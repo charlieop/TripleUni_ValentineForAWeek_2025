@@ -29,14 +29,14 @@ with open(BASE_DIR / "SECRETS.json") as f:
 DEBUG = True
 
 # HTTPS settings
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = True
 
 # HSTS settings
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_PRELOAD = True
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 # CORS settings
 APPEND_SLASH=False
@@ -54,7 +54,9 @@ CORS_ALLOW_HEADERS = (
     "Authorization",
 )
 
-ALLOWED_HOSTS = ["localhost:8000", "api.charlieop.com"]
+ALLOWED_HOSTS = ["localhost", "192.168.71.91"]
+# ALLOWED_HOSTS = ["api.charlieop.com"]
+
 
 CACHES = {
     "default": {

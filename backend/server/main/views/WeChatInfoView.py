@@ -39,6 +39,7 @@ def wechat_oauth(request):
     
     ACCESS_TOKEN = content["access_token"]
     OPENID = content["openid"]
+    UNIONID = content["unionid"]
     
     # fetch user info
     USER_INFO_URL = (
@@ -55,14 +56,14 @@ def wechat_oauth(request):
     if "errcode" in user_info_content:
         return Response(user_info_content, status=status.HTTP_400_BAD_REQUEST)
     
-    NICKNAME = user_info_content["nickname"]
-    HEADIMGURL = user_info_content["headimgurl"]
-    print(f"\nopenid: {OPENID}, nickname: {NICKNAME}\n")
+    NICKNAME = user_info_content["nickname"].encode('iso-8859-1').decode('utf-8')
+    HEADIMGURL = user_info_content["headimgurl"].encode('iso-8859-1').decode('utf-8')
     
-    return _saveToModel(OPENID, NICKNAME, HEADIMGURL)
+
+    return _saveToModel(OPENID, NICKNAME, HEADIMGURL, UNIONID)
 
 
-def _saveToModel(openid, nickname, headimgurl):
+def _saveToModel(openid, nickname, headimgurl, unionid):
     existing_user = WeChatInfo.objects.filter(openid=openid).first()
     if existing_user:
         existing_user.nickname = nickname
@@ -81,6 +82,7 @@ def _saveToModel(openid, nickname, headimgurl):
     
     data = {
         "openid": openid,
+        "unionid": unionid,
         "nickname": nickname,
         "head_image": image_file,
         "head_image_url": headimgurl

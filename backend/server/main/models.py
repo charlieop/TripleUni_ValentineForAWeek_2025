@@ -13,6 +13,7 @@ class WeChatInfo(models.Model):
     # XXX: openid is primary key, so it should be unique
     # openid = models.CharField(max_length=50, primary_key=True, editable=False, verbose_name="OpenID")
     openid = models.CharField(max_length=50, primary_key=True, verbose_name="OpenID")
+    unionid = models.CharField(max_length=50, db_index=True, verbose_name="UnionID")
 
     nickname = models.CharField(max_length=50, verbose_name="昵称")
     head_image = models.ImageField(upload_to=generateUploadPath, verbose_name="头像")
