@@ -136,7 +136,7 @@ class MatchDetailView(APIView, UtilMixin):
             "name": match.name,
             "my_info": GetWeChatInfoSerializer(me.wechat_info).data,
             "partner_info": GetWeChatInfoSerializer(partner.wechat_info).data,
-            "partner_wechat_account": partner.wechat_account,
+            "partner_wxid": partner.wxid,
             "tasks": tasks,
             "total_score": total_score,
         }

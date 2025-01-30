@@ -7,14 +7,84 @@ from ..mixin import UtilMixin, Conflict, NotFound
 from ..models import Applicant, PaymentVoucher
 from ..serializers.ApplicantSerializer import CreateApplicantSerializer, GetApplicantSerializer
 import uuid
+import copy
 
+
+def format_applicant_data(raw, openid):
+    data = copy.deepcopy(raw)
+    
+    data.pop("payment", None)
+    data.pop("quitted", None)
+    data.pop("exclude", None)
+    data["wechat_info"] = openid
+    
+    email = data.get("email", None)
+    school = data.get("school", None)
+    if school is None or email is None:
+        raise ParseError("School and email are required")
+    if school == "UST":
+        if not email.endswith("@connect.ust.hk"):
+            raise ParseError("The email is not a valid UST email")
+    elif school == "HKU":
+        if not email.endswith("@connect.hku.hk"):
+            raise ParseError("The email is not a valid HKU email")
+    elif school == "CUHK":
+        if not email.endswith("@link.cuhk.edu.hk"):
+            raise ParseError("The email is not a valid CUHK email")
+    
+    hobbies = data.pop("hobbies", [])
+    if len(hobbies) > 3:
+        raise ParseError("The number of hobbies should not exceed 3")
+    for i, hobby in enumerate(hobbies):
+        data[f"hobby{i+1}"] = hobby
+        
+    preferred_grades = data.pop("preferred_grades", [])
+    grade = ""
+    for preferred_grade in preferred_grades:
+        grade += preferred_grade
+        grade += "|"
+    data["preferred_grades"] = grade[:-1]
+    
+    preferred_schools = data.pop("preferred_schools", [])
+    school = ""
+    for preferred_school in preferred_schools:
+        school += preferred_school
+        school += "|"
+    data["preferred_schools"] = school[:-1]
+    
+    if not "continue_match" in data or data["continue_match"] is None:
+        data["continue_match"] = True
+    
+    return data
+    
+    
+def formatted_applicant_data_to_raw(data):
+    raw = copy.deepcopy(data)
+    
+    hobbies = []
+    for i in range(1, 4):
+        hobby = raw.pop(f"hobby{i}", None)
+        if hobby is not None:
+            hobbies.append(hobby)
+    raw["hobbies"] = hobbies
+    
+    preferred_grades = raw.pop("preferred_grades", None)
+    if preferred_grades is not None:
+        raw["preferred_grades"] = preferred_grades.split("|")
+        
+    preferred_schools = raw.pop("preferred_schools", None)
+    if preferred_schools is not None:
+        raw["preferred_schools"] = preferred_schools.split("|")
+    
+    return raw
+    
 
 class ApplicantView(APIView, UtilMixin):
     def get(self, request):
         openid = self.get_openid(request)
         applicant = Applicant.objects.filter(wechat_info=openid).first()
         if not applicant:
-            return Response({"error": "Applicant with the given \"openid\" does not exist"},
+            return Response({"msg": "Applicant with the given \"openid\" does not exist"},
                             status=status.HTTP_204_NO_CONTENT)
         return Response({"data": {"id": applicant.id}}, status=status.HTTP_200_OK)
 
@@ -23,10 +93,7 @@ class ApplicantView(APIView, UtilMixin):
         self.assert_application_deadline()
         
         openid = self.get_openid(request)
-        data = request.data
-        data.pop("payment", None)
-        data.pop("quitted", None)
-        data["wechat_info"] = openid
+        data = format_applicant_data(request.data, openid)
         
         serializer = CreateApplicantSerializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -42,7 +109,8 @@ class ApplicantDetailView(APIView, UtilMixin):
         openid = self.get_openid(request)
         applicant = self.get_applicant(pk, openid)
         serializer = GetApplicantSerializer(applicant)
-        return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+        raw = formatted_applicant_data_to_raw(serializer.data)
+        return Response({"data": raw}, status=status.HTTP_200_OK)
 
 
     def patch(self, request, pk):
@@ -51,10 +119,7 @@ class ApplicantDetailView(APIView, UtilMixin):
         openid = self.get_openid(request)
         applicant = self.get_applicant(pk, openid)
         
-        data = request.data
-        data.pop("wechat_info", None)
-        data.pop("payment", None)
-        data.pop("quitted", None)
+        data = format_applicant_data(request.data, openid)
 
         serializer = CreateApplicantSerializer(applicant, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -86,8 +151,6 @@ class ApplicantDepositView(APIView, UtilMixin):
 
 
     def post(self, request, pk):
-        self.assert_application_deadline()
-
         code = request.data.get("code", None)
         if code is None:
             raise ParseError("Query parameter \"code\" is required")

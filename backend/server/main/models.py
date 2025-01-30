@@ -50,6 +50,73 @@ class Applicant(models.Model):
         "M": "男",
         "F": "女"
     }
+    HOBBY = {
+        "workout": "健身",
+        "read": "阅读",
+        "film": "看剧、电影",
+        "music": "音乐",
+        "travel": "旅游",
+        "photography": "摄影",
+        "acg": "二次元",
+        "vediogame": "游戏",
+        "sport": "运动",
+        "cook": "做饭",
+        "paint": "绘画",
+        "create": "创作",
+    }
+    TRAVEL_DESTINATION = {
+        "sea": "海边",
+        "town": "安静宜人的小镇",
+        "city": "现代化大都市",
+        "none": "我不喜欢旅游"
+    }
+    SUPERPOWER = {
+        "animal": "能和所有动物交流",
+        "fly": "可以飞",
+        "mindreading": "读心术",
+        "prophecy": "可以预知1小时后的未来",
+        "resurrection": "可以复活一次"
+    }
+    USE_OF_MONEY = {
+        "invest": "投资理财",
+        "one_off": "旅行或购买心仪已久的东西",
+        "save": "储蓄起来，以备不时之需",
+        "daily": "摊开用来增加日常开销",
+        "charity": "捐赠给需要帮助的人"
+    }
+    FAMILY = {
+        2: "很重要，而且很难改变",
+        1: "重要，但是我们可以重塑自己",
+        0: "不重要，主要取决于自身"
+    }
+    LIFESTYLE = {
+        "potter": "哈利波特",
+        "1984": "1984",
+        "prince": "小王子",
+        "matrix": "黑客帝国",
+        "jurassic": "侏罗纪公园",
+        "gatsby": "了不起的盖茨比",
+    }
+    MBTI_EI = {
+        "e": "外向e",
+        "i": "内向i",
+        "x": "无"
+    }
+    MBTI_SN = {
+        "s": "感觉s",
+        "n": "直觉n",
+        "x": "无"
+    }
+    MBTI_TF = {
+        "t": "思维t",
+        "f": "情感f",
+        "x": "无"
+    }
+    MBTI_JP = {
+        "j": "判断j",
+        "p": "感知p",
+        "x": "无"
+    }
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
@@ -70,14 +137,109 @@ class Applicant(models.Model):
         verbose_name="学校"
     )
     email = models.EmailField(verbose_name="邮箱")
-    wechat_account = models.CharField(max_length=50, verbose_name="微信号")
-    
+    wxid = models.CharField(max_length=50, verbose_name="微信号")
     wechat_info = models.OneToOneField(
         "WeChatInfo",
         on_delete=models.PROTECT,
         related_name="applicant",
         db_index=True,
         verbose_name="微信信息"
+    )
+    
+    mbti_ei = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], verbose_name="MBTI-EI")
+    mbti_sn = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], verbose_name="MBTI-SN")
+    mbti_tf = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], verbose_name="MBTI-TF")
+    mbti_jp = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], verbose_name="MBTI-JP")
+    hobby1 = models.CharField(
+        max_length=20,
+        choices=HOBBY,
+        verbose_name="兴趣1"
+    )
+    hobby2 = models.CharField(
+        max_length=20,
+        choices=HOBBY,
+        null=True,
+        blank=True,
+        verbose_name="兴趣2"
+    )
+    hobby3 = models.CharField(
+        max_length=20,
+        choices=HOBBY,
+        null=True,
+        blank=True,
+        verbose_name="兴趣3"
+    )
+    travel_destination = models.CharField(
+        max_length=10,
+        choices=TRAVEL_DESTINATION,
+        verbose_name="你更期待前往哪里旅游？"
+    )
+    superpower = models.CharField(
+        max_length=20,
+        choices=SUPERPOWER,
+        verbose_name="你最希望拥有哪种超能力？"
+    )
+    use_of_money = models.CharField(
+        max_length=10,
+        choices=USE_OF_MONEY,
+        verbose_name="面对一笔意外的财富，你会："
+    )
+    family = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(2)],
+        choices=FAMILY,
+        verbose_name="你觉得原生家庭对一个人的影响"
+    )
+    lifestyle = models.CharField(
+        max_length=20,
+        choices=LIFESTYLE,
+        verbose_name="你更愿意在哪个书或电影中生活一段时间"
+    )
+    
+    preferred_sex = models.CharField(
+        max_length=1,
+        choices=SEX,
+        verbose_name="性别偏好"
+    )
+    preferred_grades = models.CharField(
+        max_length=30,
+        verbose_name="年级偏好"
+    )
+    preferred_schools = models.CharField(
+        max_length=20,
+        verbose_name="学校偏好"
+    )
+    preferred_mbti_ei = models.CharField(
+        max_length=1,
+        choices=MBTI_EI,
+        verbose_name="MBTI-EI偏好"
+    )
+    preferred_mbti_sn = models.CharField(
+        max_length=1,
+        choices=MBTI_SN,
+        verbose_name="MBTI-SN偏好"
+    )
+    preferred_mbti_tf = models.CharField(
+        max_length=1,
+        choices=MBTI_TF,
+        verbose_name="MBTI-TF偏好"
+    )
+    preferred_mbti_jp = models.CharField(
+        max_length=1,
+        choices=MBTI_JP,
+        verbose_name="MBTI-JP偏好"
+    )
+    preferred_wxid = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name="匹配对象偏好"
+    )
+    continue_match = models.BooleanField(default=True, verbose_name="愿意继续匹配")
+    comment = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+        verbose_name="留言"
     )
     
     payment = models.OneToOneField(
@@ -90,6 +252,7 @@ class Applicant(models.Model):
     )
     
     quitted = models.BooleanField(default=False, verbose_name="已退出")
+    exclude = models.BooleanField(default=False, verbose_name="人工排除")
     
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)

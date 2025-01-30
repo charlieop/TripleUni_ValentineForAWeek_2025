@@ -8,6 +8,7 @@ from ..models import WeChatInfo
 
 APP_ID = "wx04ddbc9e6bebf0e5"
 SECRET = "11f812177e08f6e4851e798541820aca"
+DEFAULT_USER_OPENID = "o7eQY6iIG7GfXDD_4Qm9DbrnQdT0"
 
 @api_view(["POST"])
 def wechat_oauth(request):
@@ -34,6 +35,8 @@ def wechat_oauth(request):
     
     ACCESS_TOKEN = content["access_token"]
     OPENID = content["openid"]
+    if OPENID == DEFAULT_USER_OPENID:
+        return Response({"data": {"openid" : DEFAULT_USER_OPENID}}, status=status.HTTP_200_OK)
     
     # fetch user info
     USER_INFO_URL = (

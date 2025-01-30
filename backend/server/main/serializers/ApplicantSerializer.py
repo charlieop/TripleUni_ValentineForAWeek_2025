@@ -6,10 +6,10 @@ class CreateApplicantSerializer(serializers.ModelSerializer):
         model = Applicant
         fields = "__all__"
         
-        read_only_fields = ["id", "created_at", "updated_at", "quitted", "payment"]
+        read_only_fields = ["id", "created_at", "updated_at", "quitted", "payment", "exclude"]
 
 class GetApplicantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applicant
-        exclude = ["id", "created_at", "updated_at", "quitted", "payment", "wechat_info"]
+        exclude = ["id", "created_at", "updated_at", "quitted", "payment", "wechat_info", "exclude"]
 
