@@ -132,13 +132,13 @@ class UtilMixin:
     def assert_match_results_released(self, match):
         if match.round == 1 and not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
             raise PermissionDenied("第一轮的匹配结果暂未公布")
-        elif not AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_RELEASE):
+        if match.round == 2 and not AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_RELEASE):
             raise PermissionDenied("第二轮的匹配结果暂未公布")
         
     def assert_match_confirm_deadline(self, match):
         if match.round == 1 and AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
             raise PermissionDenied("第一轮的押金缴纳DDL已过")
-        elif AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
+        if match.round == 2 and AppConfig.passed(AppConfig.SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE):
             raise PermissionDenied("第二轮的押金缴纳DDL已过")
 
     def assert_event_started(self):

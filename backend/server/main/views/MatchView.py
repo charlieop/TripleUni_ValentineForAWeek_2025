@@ -24,10 +24,10 @@ class MatchResultView(APIView, UtilMixin):
             return Response({"msg": "找不到你的匹配结果"},
                             status=status.HTTP_204_NO_CONTENT)
         if matches.count() == 1:
-            return Response({"data": {"id": matches[0].id}}, status=status.HTTP_200_OK)
+            return Response({"data": {"id": matches[0].id, "round": matches[0].round}}, status=status.HTTP_200_OK)
         
         active_Match = matches.filter(discarded=False).last()
-        return Response({"data": {"id": active_Match.id}}, status=status.HTTP_200_OK)
+        return Response({"data": {"id": active_Match.id, "round": active_Match.round}}, status=status.HTTP_200_OK)
 
 
 
@@ -58,13 +58,15 @@ class MatchPartnerView(APIView, UtilMixin):
             raise PaymentRequired("你需要支付押金才能继续")
         
         return_data = {
+            "round": match.round,
             "discarded": match.discarded,
             "discard_reason": match.discard_reason,
             "my_status": match.applicant1_status if my_index == 1 else match.applicant2_status,
             "partner_status": match.applicant2_status if my_index == 1 else match.applicant1_status,
-            "my_info": GetWeChatInfoSerializer(me.wechat_info).data,
             "partner_info": GetWeChatInfoSerializer(partner.wechat_info).data,
-            "partner_paid": partner.payment is not None
+            "partner_paid": partner.payment is not None,
+            "partner_sex": partner.sex,
+            "partner_school": partner.school,
         }
         return Response({"data": return_data}, status=status.HTTP_200_OK)
 

@@ -54,7 +54,7 @@ CORS_ALLOW_HEADERS = (
     "Authorization",
 )
 
-ALLOWED_HOSTS = ["localhost", "192.168.71.91"]
+ALLOWED_HOSTS = ["localhost", "192.168.71.91", "127.0.0.1"]
 # ALLOWED_HOSTS = ["api.charlieop.com"]
 
 
