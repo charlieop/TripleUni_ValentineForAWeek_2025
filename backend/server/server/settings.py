@@ -54,6 +54,7 @@ CORS_ALLOW_HEADERS = (
     "Authorization",
 )
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ALLOWED_HOSTS = ["localhost", "192.168.71.91", "127.0.0.1"]
 # ALLOWED_HOSTS = ["api.charlieop.com"]
 

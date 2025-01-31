@@ -244,7 +244,7 @@ class Applicant(models.Model):
     )
     
     payment = models.OneToOneField(
-        "PaymentVoucher",
+        "PaymentRecord",
         on_delete=models.PROTECT,
         related_name="applicant",
         null=True,
@@ -271,22 +271,21 @@ class Applicant(models.Model):
         ordering = ["school", "grade", "name", "created_at"]
     
     
-class PaymentVoucher(models.Model):
+class PaymentRecord(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    assigned_to = models.ForeignKey(
-        "Mentor",
-        on_delete=models.PROTECT,
-        related_name="vouchers",
-        verbose_name="发放者",
-    )
+    
+    out_trade_no = models.CharField(max_length=33, verbose_name="商户订单号")
+    transaction_id = models.CharField(max_length=30, verbose_name="微信支付订单号")
+    
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
+        
     def __str__(self):
-        return f"发放人:{self.assigned_to.name} | 兑换人:{self.applicant.name if hasattr(self, 'applicant') else '未指定'}"
+        return f"付款人: {self.applicant.name if hasattr(self, 'applicant') else '未知'} - {self.transaction_id}"
     class Meta:
-        verbose_name = "付款凭证"
-        verbose_name_plural = "付款凭证"
-        db_table = "payment_voucher"
-        ordering = ["assigned_to", "applicant", "created_at"]
+        verbose_name = "付款记录"
+        verbose_name_plural = "付款记录"
+        db_table = "payment_record"
+        ordering = ["created_at"]
 
 
 class Mentor(AbstractUser):

@@ -6,6 +6,7 @@ from .views.MatchView import MatchResultView, MatchMentorView, MatchPartnerView,
 from .views.TaskView import TaskDetailView
 from .views.ImageView import ImageView, ImageDetailView
 from .views.MissionView import MissionView, SecretMissionView
+from .views.WeChatPaymentView import WeChatPaymentView
 from django.urls import re_path
 
 urlpatterns = [
@@ -27,5 +28,7 @@ urlpatterns = [
     re_path(r'^matches/(?P<pk>\d+)/tasks/day(?P<day>[1-7])/images/(?P<img_pk>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/$', ImageDetailView.as_view()),
     
     path("missions/", MissionView.as_view()),
-    path("secret-missions/", SecretMissionView.as_view())
+    path("secret-missions/", SecretMissionView.as_view()),
+    
+    path("wechat/payment/", WeChatPaymentView.as_view()),
 ]

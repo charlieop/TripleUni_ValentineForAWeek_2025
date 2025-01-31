@@ -6,3 +6,4 @@ django-cors-headers
 Pillow
 requests
 redis
+wechatpayv3

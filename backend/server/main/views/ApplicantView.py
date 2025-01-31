@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound, ParseError, PermissionDenied
 
 from ..mixin import UtilMixin, Conflict, NotFound
-from ..models import Applicant, PaymentVoucher
+from ..models import Applicant, PaymentRecord
 from ..serializers.ApplicantSerializer import CreateApplicantSerializer, GetApplicantSerializer
 import uuid
 import copy
@@ -82,7 +82,7 @@ def formatted_applicant_data_to_raw(data):
 class ApplicantView(APIView, UtilMixin):
     def get(self, request):
         openid = self.get_openid(request)
-        applicant = Applicant.objects.filter(wechat_info=openid).first()
+        applicant = self.get_applicant_by_openid(openid)
         if not applicant:
             return Response({"msg": "找不到此OpenId对应的申请者"},
                             status=status.HTTP_204_NO_CONTENT)
@@ -148,30 +148,3 @@ class ApplicantDepositView(APIView, UtilMixin):
         if applicant.payment is None:
             return Response({"data": {"paid": False}}, status=status.HTTP_200_OK)
         return Response({"data": {"paid": True}}, status=status.HTTP_200_OK)
-
-
-    def post(self, request, pk):
-        code = request.data.get("code", None)
-        if code is None:
-            raise ParseError("无法在请求体中找到参数”code“")
-
-        openid = self.get_openid(request)
-        applicant = self.get_applicant(pk, openid)
-        
-        if applicant.payment is not None:
-            raise Conflict("申请者已经支付了押金")
-
-        try:
-            uuid.UUID(code)
-        except ValueError:
-            raise ParseError("填写的兑换码格式不正确")
-        payment = PaymentVoucher.objects.filter(id=code).first()
-        if not payment:
-            raise NotFound("此兑换码不存在")
-        if hasattr(payment, "applicant") and payment.applicant is not None:
-            raise Conflict("此兑换码已经被使用")
-
-        applicant.payment = payment
-        applicant.save()
-        self.refresh_applicant_cache(applicant)
-        return Response({"msg": "押金缴付验证成功"}, status=status.HTTP_200_OK)

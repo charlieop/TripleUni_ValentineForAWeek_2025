@@ -3,6 +3,7 @@ from rest_framework.exceptions import APIException, NotFound, PermissionDenied, 
 import uuid
 import pickle
 from django.core.cache import cache
+from django.db.models import Q
 
 from .models import Applicant, Match
 from .AppConfig import AppConfig
@@ -40,7 +41,10 @@ class UtilMixin:
         if openid is None:
             raise ParseError("Authorization header with user \"openid\" is required")
         return openid
-
+    
+    def get_applicant_by_openid(self, openid):
+        applicant = Applicant.objects.filter(wechat_info=openid).first()
+        return applicant
 
     def get_applicant(self, pk, openid):
         try:
@@ -70,7 +74,17 @@ class UtilMixin:
     def refresh_applicant_cache(self, applicant):
         KEY = self._get_applicant_key(applicant.id)
         cache.delete(KEY)
-
+        
+    def get_latest_match_by_openid(self, openid):
+        if not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
+            raise PermissionDenied("匹配结果暂未公布")
+        matches = Match.objects.filter(Q(applicant1__wechat_info=openid) |  Q(applicant2__wechat_info=openid))
+        if not matches:
+            return None
+        if matches.count() == 1:
+            return matches[0]
+        active_Match = matches.filter(discarded=False).last()
+        return active_Match
 
     def get_match(self, pk, openid):
         KEY = self._get_match_key(pk)
@@ -102,7 +116,7 @@ class UtilMixin:
 
     def assert_match_auth(self, match, me):
         if me.payment is None:
-            raise PaymentRequired("你需要支付押金才能继续")
+            raise PaymentRequired("你需要支付押金以继续")
         if match.discarded:
             raise PermissionDenied(f"此配对已经作废, 原因是: {match.discard_reason or '未知'}")
 

@@ -15,19 +15,12 @@ from ..AppConfig import AppConfig
 
 class MatchResultView(APIView, UtilMixin):
     def get(self, request):
-        if not AppConfig.passed(AppConfig.FIRST_ROUND_MATCH_RESULTS_RELEASE):
-            raise PermissionDenied("匹配结果暂未公布")
-        
         openid = self.get_openid(request)
-        matches = Match.objects.filter(Q(applicant1__wechat_info=openid) |  Q(applicant2__wechat_info=openid))
-        if not matches:
+        latest_match = self.get_latest_match_by_openid(openid)
+        if not latest_match:
             return Response({"msg": "找不到你的匹配结果"},
                             status=status.HTTP_204_NO_CONTENT)
-        if matches.count() == 1:
-            return Response({"data": {"id": matches[0].id, "round": matches[0].round}}, status=status.HTTP_200_OK)
-        
-        active_Match = matches.filter(discarded=False).last()
-        return Response({"data": {"id": active_Match.id, "round": active_Match.round}}, status=status.HTTP_200_OK)
+        return Response({"data": {"id": latest_match.id, "round": latest_match.round}}, status=status.HTTP_200_OK)
 
 
 
