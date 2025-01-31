@@ -27,10 +27,10 @@
         />
       </div>
       <h3>
-        {{ text || "正在联系月老" }}
+        {{ props.text || "正在联系月老" }}
         <span class="dots">...</span>
       </h3>
-
+      <button>hidden</button>
       <div class="decor-hearts">
         <div class="heart">
           <svg
@@ -77,11 +77,11 @@
 </template>
 
 <script setup lang="ts">
+
 const props = defineProps<{
   text: string | null;
 }>();
 
-const text = ref(props.text);
 </script>
 
 <style scoped>
@@ -92,10 +92,6 @@ const text = ref(props.text);
   padding: 0.5rem 1rem;
   position: relative;
   overflow: hidden;
-}
-.logo img {
-  margin-inline: auto;
-  transform: translateX(-2%);
 }
 h3 {
   display: flex;
@@ -121,6 +117,10 @@ h3 {
   to {
     clip-path: inset(0 -1ch 0 0);
   }
+}
+button {
+  opacity: 0;
+  outline: none;
 }
 
 .decor-couple {

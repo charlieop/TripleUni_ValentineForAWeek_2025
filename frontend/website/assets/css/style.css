@@ -16,7 +16,8 @@
 
     --clr-accent: hsl(42, 100%, 60%);
 
-    --clr-danger: hsl(0, 100%, 50%);
+    --clr-success: hsl(120, 84%, 35%);
+    --clr-danger: hsl(0, 87%, 44%);
   }
 }
 @media (prefers-color-scheme: light) {
@@ -35,7 +36,8 @@
 
     --clr-accent: hsl(42, 100%, 50%);
 
-    --clr-danger: hsl(0, 100%, 50%);
+    --clr-success: hsl(120, 88%, 41%);
+    --clr-danger: hsl(0, 85%, 49%);
   }
 }
 
@@ -106,4 +108,16 @@ button.secondary:hover {
 button.btn {
   border: 3px solid var(--clr-text);
   border-radius: 30px 2px 30% 3px / 4px 10px 3px 30px;
+}
+button.danger {
+  --_color: var(--clr-danger);
+  font-size: var(--fs-300);
+  padding-inline: 0.125rem;
+}
+
+
+.logo img {
+  width: 100%;
+  transform: translateX(-2%);
+  margin-bottom: -0.5rem;
 }

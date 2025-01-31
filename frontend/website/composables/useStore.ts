@@ -26,7 +26,44 @@ export const useStore = () => {
     localStorage.removeItem("applicantId");
   };
 
-  
+  const setDeleted = (): void => {
+    localStorage.setItem("deleted", "true");
+  };
+  const getDeleted = (): boolean => {
+    return localStorage.getItem("deleted") === "true";
+  };
+  const clearDeleted = (): void => {
+    localStorage.removeItem("deleted");
+  };
+
+  const setMatchInfo = (
+    matchId: number,
+    round: 1 | 2,
+    discarded: boolean = false
+  ): void => {
+    const matchInfo = JSON.stringify({ matchId, round, discarded });
+    localStorage.setItem("matchInfo", matchInfo);
+  };
+  const getMatchInfo = (): { matchId: number; round: 1 | 2, discarded: boolean } | null => {
+    const matchInfo = localStorage.getItem("matchInfo");
+    if (matchInfo) {
+      return JSON.parse(matchInfo) as { matchId: number; round: 1 | 2; discarded: boolean };
+    }
+    return null;
+  };
+  const clearMatchInfo = (): void => {
+    localStorage.removeItem("matchInfo");
+  };
+
+  const setPaid = (): void => {
+    localStorage.setItem("paid", "true");
+  }
+  const getPaid = (): boolean => {
+    return localStorage.getItem("paid") === "true";
+  }
+  const clearPaid = (): void => {
+    localStorage.removeItem("paid");
+  }
 
   return {
     setOpenId,
@@ -36,5 +73,17 @@ export const useStore = () => {
     setApplicantId,
     getApplicantId,
     clearApplicantId,
+
+    setDeleted,
+    getDeleted,
+    clearDeleted,
+
+    setMatchInfo,
+    getMatchInfo,
+    clearMatchInfo,
+
+    setPaid,
+    getPaid,
+    clearPaid,
   };
 };

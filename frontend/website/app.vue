@@ -13,7 +13,6 @@
 
     <UNotifications />
     <UModals />
-
   </div>
 </template>
 

@@ -1,6 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { resolve } from "path";
 
+const IMAGE_BASE_URL = "https://i.boatonland.com/valentine/2025/";
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: false },

@@ -1,11 +1,4 @@
-const API_URL = "https://api.charlieop.com/api/v1/";
-const CONFIG_URL = "https://api.charlieop.com/media/config.json";
-// const API_URL = "http://192.168.71.91:8000/api/v1/";
-// const CONFIG_URL = "http://192.168.71.91:8000/media/config.json";
-
-
-
-const { getOpenId } = useStore();
+const { getOpenId, setDeleted } = useStore();
 
 export const useHttp = () => {
   const _fetch = (endpoint: string, options: RequestInit = {}) => {
@@ -61,7 +54,6 @@ export const useHttp = () => {
     const data = await response.json();
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
-
   const postApplicant = async (applicant: any): Promise<string> => {
     const response = await _fetch("applicants/", {
       method: "POST",
@@ -82,9 +74,11 @@ export const useHttp = () => {
     if (response.status === 200) {
       return data.data;
     }
+    if (response.status === 410) {
+      setDeleted();
+    }
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
-
   const patchApplicant = async (
     applicant_id: string,
     applicant: any
@@ -99,7 +93,6 @@ export const useHttp = () => {
     const data = await response.json();
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
-
   const deleteApplicant = async (applicant_id: string): Promise<boolean> => {
     const response = await _fetch(`applicants/${applicant_id}/`, {
       method: "DELETE",
@@ -123,7 +116,6 @@ export const useHttp = () => {
     }
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
-
   const postApplicantPaymentVoucher = async (
     applicant_id: string,
     voucher_id: string
@@ -139,15 +131,75 @@ export const useHttp = () => {
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
 
+  const fetchMatchResult = async (): Promise<{
+    id: number;
+    round: 1 | 2;
+  } | null> => {
+    const response = await _fetch("matches/result/", {
+      method: "GET",
+    });
+    if (response.status === 204) {
+      return null;
+    }
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+  const fetchMatchMentor = async (match_id: number): Promise<any> => {
+    const response = await _fetch(`matches/${match_id}/mentor/`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+  const fetchMatchPartner = async (match_id: number): Promise<MatchDetail> => {
+    const response = await _fetch(`matches/${match_id}/partner/`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data as MatchDetail;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+  const postMatchConfirmation = async (
+    match_id: number,
+    confirmation: boolean
+  ): Promise<boolean> => {
+    const action = confirmation ? "A" : "R";
+    const response = await _fetch(`matches/${match_id}/partner/`, {
+      method: "POST",
+      body: JSON.stringify({ action }),
+    });
+    if (response.status === 200) {
+      return true;
+    }
+    const data = await response.json();
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
   return {
     fetchConfig,
     fetchOpenId,
+
     fetchApplicantId,
     postApplicant,
+
     fetchApplicantDetail,
     patchApplicant,
     deleteApplicant,
+
     getApplicantHasPaid,
     postApplicantPaymentVoucher,
+
+    fetchMatchResult,
+    fetchMatchMentor,
+    fetchMatchPartner,
+    postMatchConfirmation,
   };
 };

@@ -1,23 +1,32 @@
 <template>
   <div class="index-wrapper">
-    <div class="decor-chat">
-      <img :src="IMAGE_BASE_URL + 'chat.gif'" alt="Decor Chat" />
-    </div>
     <div class="logo">
       <img
+        class="b"
         :src="IMAGE_BASE_URL + 'logo-b.webp'"
         alt="Valentine For A Week Logo"
         v-if="!isDarkMode"
       />
-      <img :src="IMAGE_BASE_URL + 'logo-w.webp'" alt="Valentine For A Week Logo" v-else />
+      <img
+        class="b"
+        :src="IMAGE_BASE_URL + 'logo-w.webp'"
+        alt="Valentine For A Week Logo"
+        v-else
+      />
+    </div>
+    <div class="decor-chat">
+      <img :src="IMAGE_BASE_URL + 'chat.gif'" alt="Decor Chat" />
     </div>
     <div class="decor-couple">
-      <img :src="IMAGE_BASE_URL + 'couple3.webp'" alt="" />
+      <img class="a" :src="IMAGE_BASE_URL + 'couple3.webp'" alt="" />
     </div>
     <div class="content-wrapper">
       <div>
         <button class="btn primary" disabled v-if="state === States.UNKNOWN">
           加载中...
+        </button>
+        <button class="btn primary" disabled v-if="state === States.DELETE">
+          已取消报名
         </button>
         <router-link to="/application" v-if="state === States.APPLICATION_OPEN">
           <button class="btn primary">立即报名</button>
@@ -62,9 +71,6 @@
         </button>
       </a>
     </div>
-
-    <!-- XXX: to be removed -->
-    <button class="test primary" @click="logout">测试用: 清缓存</button>
   </div>
   <ModalCancelApplication :model-value="openModal" @close="openModal = false" />
 </template>
@@ -78,27 +84,22 @@ enum States {
   EVENT_START = 4,
   EVENT_END = 5,
   NO_MATCH = 6,
+  DELETE = 7,
   UNKNOWN = -1,
 }
 
-const { getApplicantId } = useStore();
-const { CONFIG, getMatchId } = useReactive();
+const router = useRouter();
+const { getApplicantId, getDeleted, getMatchInfo } = useStore();
+const { CONFIG } = useReactive();
 const openModal = ref(false);
 
 useHead({
   title: "一周CP 2025 | 首页",
 });
 
-// XXX: to be removed
-function logout() {
-  localStorage.removeItem("openId");
-  localStorage.removeItem("applicantId");
-  sessionStorage.removeItem("matchId");
-  sessionStorage.removeItem("config");
-}
-
 const state = computed(() => {
   if (!CONFIG.value) return States.UNKNOWN;
+  if (getDeleted()) return States.DELETE;
   const now = new Date();
   if (now < new Date(CONFIG.value.APPLICATION_DEADLINE)) {
     return getApplicantId() === null
@@ -108,32 +109,61 @@ const state = computed(() => {
   if (now < new Date(CONFIG.value.FIRST_ROUND_MATCH_RESULTS_RELEASE)) {
     return States.APPLICATION_END;
   }
-  // XXX: 无匹配记录处理
+
   if (now < new Date(CONFIG.value.EVENT_START)) {
     return States.MATCH_RESULT_AVALIABLE;
   }
 
+  if (getMatchInfo() === null) {
+    return States.NO_MATCH;
+  }
+
   if (now < new Date(CONFIG.value.EVENT_END)) {
-    return getMatchId() === null ? States.NO_MATCH : States.EVENT_START;
+    return States.EVENT_START;
   }
   return States.EVENT_END;
 });
 
-onMounted(() => {});
+function clearCache() {
+  const { clearApplicantId, clearDeleted, clearOpenId, clearMatchInfo, clearPaid } =
+    useStore();
+  const { clearConfig } = useReactive();
+  clearApplicantId();
+  clearDeleted();
+  clearOpenId();
+  clearMatchInfo();
+  clearConfig();
+  clearPaid();
+  router.push("/login");
+}
+
+let clickState = 0;
+onMounted(() => {
+  addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains("a") && clickState === 0) {
+      clickState = 1;
+      return;
+    }
+    if (target.classList.contains("a") && clickState === 1) {
+      clickState = 2;
+      return;
+    }
+    if (target.classList.contains("b") && clickState === 2) {
+      clickState = 3;
+      return;
+    }
+    if (target.classList.contains("a") && clickState === 3) {
+      clickState = 0;
+      clearCache();
+      return;
+    }
+    clickState = 0;
+  });
+});
 </script>
 
 <style scoped>
-.test {
-  position: absolute;
-  z-index: 999;
-  bottom: 0.25rem;
-  right: 1rem;
-  --_color: var(--clr-accent);
-  font-size: 14px;
-  width: fit-content;
-  padding: 0.25rem;
-}
-
 .index-wrapper {
   width: 100%;
   height: 100%;
@@ -189,18 +219,6 @@ onMounted(() => {});
   display: grid;
   grid-template-columns: 2fr 1fr;
 }
-.danger {
-  --_color: var(--clr-danger);
-  font-size: var(--fs-300);
-  padding-inline: 0.125rem;
-}
-
-.logo img {
-  width: 100%;
-  transform: translateX(-2%);
-  margin-bottom: -0.5rem;
-}
-
 button {
   display: block;
   margin: 1.5vh auto;

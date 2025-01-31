@@ -1,46 +1,31 @@
-interface Config {
-  APPLICATION_DEADLINE: string;
-  FIRST_ROUND_MATCH_RESULTS_RELEASE: string;
-  FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE: string;
-  SECOND_ROUND_MATCH_RESULTS_RELEASE: string;
-  SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE: string;
-  EVENT_START: string;
-  FIRST_TASK_START: string;
-  FIRST_TASK_DEADLINE: string;
-  EVENT_END: string;
-}
+const defaultConfig: Config = {
+  APPLICATION_DEADLINE: "2025/02/04 10:00:00",
+  FIRST_ROUND_MATCH_RESULTS_RELEASE: "2025/02/04 20:00:00",
+  FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE: "2025/02/05 23:59:59",
+  SECOND_ROUND_MATCH_RESULTS_RELEASE: "2025/02/06 09:00:00",
+  SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE: "2025/02/07 12:00:00",
+  EVENT_START: "2025/02/07 23:00:00",
+  FIRST_TASK_START: "2025/02/08 00:00:00",
+  FIRST_TASK_DEADLINE: "2025/02/09 01:00:00",
+  EVENT_END: "2025/02/15 02:00:00",
+};
 
 export const useReactive = () => {
-  const setMatchId = (matchId: number): void => {
-    sessionStorage.setItem("matchId", matchId.toString());
-  };
-  const getMatchId = (): number | null => {
-    const matchId = sessionStorage.getItem("matchId");
-    return matchId ? parseInt(matchId, 10) : null;
-  };
-  const clearMatchId = (): void => {
-    sessionStorage.removeItem("matchId");
-  };
-
   const setConfig = (config: Config): void => {
-    sessionStorage.setItem("config", JSON.stringify(config));
+    localStorage.setItem("config", JSON.stringify(config));
     CONFIG.value = config;
   };
-  const getConfig = (): Config | null => {
-    const config = sessionStorage.getItem("config");
-    return config ? JSON.parse(config) : null;
+  const getConfig = (): Config => {
+    const config = localStorage.getItem("config");
+    return config ? JSON.parse(config) : defaultConfig;
   };
   const clearConfig = (): void => {
-    sessionStorage.removeItem("config");
-    CONFIG.value = null;
+    localStorage.removeItem("config");
+    CONFIG.value = defaultConfig;
   };
-  const CONFIG = useState<Config | null>("config", () => getConfig());
+  const CONFIG = useState<Config>("config", () => getConfig());
 
   return {
-    setMatchId,
-    getMatchId,
-    clearMatchId,
-
     setConfig,
     getConfig,
     clearConfig,

@@ -20,13 +20,13 @@
         虚拟账号将被<strong>取消资格</strong>
       </p>
       <a :href="url">
-        <button class="btn primary danger">登录微信授权</button>
+        <button class="btn primary">登录微信授权</button>
       </a>
     </div>
     <div class="content-wrapper" v-else>
       <h1>正在获取OpenId...</h1>
       <p class="push">请稍候...</p>
-      <button class="btn primary danger" @click="refresh">
+      <button class="btn primary" @click="refresh">
         刷新页面(如果无反应)
       </button>
     </div>
@@ -61,11 +61,6 @@ let url =
   encodeURIComponent(window.location.href) +
   "&response_type=code&scope=snsapi_userinfo#wechat_redirect";
 
-function refresh() {
-  const url = new URL(window.location.href);
-  window.location.href = url.origin + url.pathname;
-}
-
 onMounted(() => {
   const code = queryParams.code;
   if (typeof code === "string") {
@@ -92,11 +87,6 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.logo img {
-  width: 100%;
-  transform: translateX(-2%);
-  margin-bottom: -1rem;
-}
 .content-wrapper {
   line-height: 1.5;
   padding: 0 1.5rem;

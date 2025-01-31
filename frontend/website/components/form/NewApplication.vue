@@ -836,19 +836,20 @@
       <FormStepsControls />
     </template>
   </Vueform>
-  <ModalLoading :model-value="showLoader" :text="loadingText" />
+  <ModalLoading v-model="showLoader" :text="loadingText" />
 </template>
 
 <script setup lang="ts">
-interface VueformInstance {
-  data: Record<string, any>;
-  load(data: Record<string, any>): void;
-}
 const form$: Ref<null | VueformInstance> = ref(null);
-const { postApplicant, fetchApplicantDetail, fetchApplicantId, patchApplicant } = useHttp();
+const {
+  postApplicant,
+  fetchApplicantDetail,
+  fetchApplicantId,
+  patchApplicant,
+} = useHttp();
 const { setApplicantId, getApplicantId, clearApplicantId } = useStore();
 const router = useRouter();
-const showLoader = ref(true);
+const showLoader = ref(false);
 const loadingText: Ref<string | null> = ref(null);
 
 async function handleSubmit() {
@@ -869,7 +870,7 @@ async function handleSubmit() {
         showLoader.value = false;
         loadingText.value = null;
       });
-    return
+    return;
   }
   postApplicant(form$.value.data)
     .then((applicantId: string) => {
@@ -882,11 +883,13 @@ async function handleSubmit() {
       loadingText.value = null;
     });
 }
+
 async function onFormMounted() {
+  loadingText.value = "查找你的档案中";
+  showLoader.value = true;
+
   let applicantId = getApplicantId();
   if (!applicantId) {
-    loadingText.value = "查找你的档案中";
-    showLoader.value = true;
     applicantId = await fetchApplicantId();
   }
   if (!applicantId) {
