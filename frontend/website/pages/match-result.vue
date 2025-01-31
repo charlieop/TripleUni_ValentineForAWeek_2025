@@ -30,6 +30,10 @@
 </template>
 
 <script setup lang="ts">
+useHead({
+  title: "一周CP 2025 | 查看匹配结果",
+});
+
 const {
   fetchApplicantId,
   getApplicantHasPaid,

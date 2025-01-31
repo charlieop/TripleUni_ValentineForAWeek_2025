@@ -771,7 +771,7 @@
         <StaticElement name="h3_4" tag="h3" content="心仪的人" />
         <TextElement
           name="preferred_wxid"
-          label="如果你有想匹配的对象，请留下ta的微信号"
+          label="如果你有想匹配的人，请留下ta的微信号"
           description="（请注意，这并不保证100%成功，前提是对方也希望与你匹配）请确定微信号填写正确，且可被添加，请留下微信号而非电话号码，若有一方留下电话号码，而另一方留下微信号，系统将不能成功匹配."
           :rules="['max:50']"
         />

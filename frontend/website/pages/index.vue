@@ -85,6 +85,10 @@
 </template>
 
 <script setup lang="ts">
+useHead({
+  title: "一周CP 2025 | 首页",
+});
+
 enum States {
   APPLICATION_OPEN = 0,
   APPLICATION_SUBMITTED = 1,
@@ -103,9 +107,6 @@ const { CONFIG } = useReactive();
 const openModal = ref(false);
 const openHelpModal = ref(false);
 
-useHead({
-  title: "一周CP 2025 | 首页",
-});
 
 const state = computed(() => {
   if (!CONFIG.value) return States.UNKNOWN;
