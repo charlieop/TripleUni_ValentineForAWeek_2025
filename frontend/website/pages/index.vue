@@ -71,7 +71,16 @@
         </button>
       </a>
     </div>
+    <UButton
+      @click="openHelpModal = true"
+      class="help"
+      variant="link"
+      icon="ic:round-help-outline"
+      square
+      size="sm"
+    ></UButton>
   </div>
+  <ModalHelp :model-value="openHelpModal" @close="openHelpModal = false" />
   <ModalCancelApplication :model-value="openModal" @close="openModal = false" />
 </template>
 
@@ -92,6 +101,7 @@ const router = useRouter();
 const { getApplicantId, getDeleted, getMatchInfo } = useStore();
 const { CONFIG } = useReactive();
 const openModal = ref(false);
+const openHelpModal = ref(false);
 
 useHead({
   title: "一周CP 2025 | 首页",
@@ -123,47 +133,17 @@ const state = computed(() => {
   }
   return States.EVENT_END;
 });
-
-function clearCache() {
-  const { clearApplicantId, clearDeleted, clearOpenId, clearMatchInfo, clearPaid } =
-    useStore();
-  const { clearConfig } = useReactive();
-  clearApplicantId();
-  clearDeleted();
-  clearOpenId();
-  clearMatchInfo();
-  clearConfig();
-  clearPaid();
-  router.push("/login");
-}
-
-let clickState = 0;
-onMounted(() => {
-  addEventListener("click", (e) => {
-    const target = e.target as HTMLElement;
-    if (target.classList.contains("a") && clickState === 0) {
-      clickState = 1;
-      return;
-    }
-    if (target.classList.contains("a") && clickState === 1) {
-      clickState = 2;
-      return;
-    }
-    if (target.classList.contains("b") && clickState === 2) {
-      clickState = 3;
-      return;
-    }
-    if (target.classList.contains("a") && clickState === 3) {
-      clickState = 0;
-      clearCache();
-      return;
-    }
-    clickState = 0;
-  });
-});
 </script>
 
 <style scoped>
+.help {
+  position: absolute;
+  width: fit-content;
+  top: -0.375rem;
+  left: 0.25rem;
+  scale: 1.5;
+}
+
 .index-wrapper {
   width: 100%;
   height: 100%;
