@@ -116,20 +116,6 @@ export const useHttp = () => {
     }
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
-  const postApplicantPaymentVoucher = async (
-    applicant_id: string,
-    voucher_id: string
-  ): Promise<boolean> => {
-    const response = await _fetch(`applicants/${applicant_id}/deposit/`, {
-      method: "POST",
-      body: JSON.stringify({ code: voucher_id }),
-    });
-    if (response.status === 200) {
-      return true;
-    }
-    const data = await response.json();
-    throw new Error(`${JSON.stringify(data?.detail || data)}`);
-  };
 
   const fetchMatchResult = async (): Promise<{
     id: number;
@@ -147,13 +133,13 @@ export const useHttp = () => {
     }
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
-  const fetchMatchMentor = async (match_id: number): Promise<any> => {
+  const fetchMatchMentor = async (match_id: number): Promise<MentorInfo> => {
     const response = await _fetch(`matches/${match_id}/mentor/`, {
       method: "GET",
     });
     const data = await response.json();
     if (response.status === 200) {
-      return data.data;
+      return data.data as MentorInfo;
     }
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
@@ -183,6 +169,17 @@ export const useHttp = () => {
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
 
+  const requestPayment = async (): Promise<PaymentDetails> => {
+    const response = await _fetch("wechat/payment/", {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data as PaymentDetails;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
   return {
     fetchConfig,
     fetchOpenId,
@@ -195,11 +192,12 @@ export const useHttp = () => {
     deleteApplicant,
 
     getApplicantHasPaid,
-    postApplicantPaymentVoucher,
 
     fetchMatchResult,
     fetchMatchMentor,
     fetchMatchPartner,
     postMatchConfirmation,
+
+    requestPayment,
   };
 };

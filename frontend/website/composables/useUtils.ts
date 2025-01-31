@@ -5,6 +5,8 @@ export const API_HOST = "https://api.charlieop.com";
 // export const CONFIG_URL = "http://192.168.71.91:8000/media/config.json";
 // export const API_HOST = "http://192.168.71.91:8000";
 
+export const APPID = "wx09ec18a3cf830379";
+
 export const isWechat = computed(() => {
   var ua = window.navigator.userAgent.toLowerCase();
   if (ua.match(/MicroMessenger/i) !== null) {
@@ -64,9 +66,23 @@ export interface Config {
   EVENT_END: string;
 }
 
-export interface Match {
-  id: number;
+export interface PaymentDetails {
+  appId: string;
+  timeStamp: string;
+  nonceStr: string;
+  package: string;
+  signType: string;
+  paySign: string;
+}
+
+export interface MatchInfo {
+  matchId: number;
+  round: 1 | 2;
+  discarded: boolean;
+}
+
+export interface MentorInfo {
   name: string;
-  start: string;
-  end: string;
+  wechat: string;
+  wechat_qrcode: string;
 }

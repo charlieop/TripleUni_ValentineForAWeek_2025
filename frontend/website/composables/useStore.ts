@@ -44,7 +44,7 @@ export const useStore = () => {
     const matchInfo = JSON.stringify({ matchId, round, discarded });
     localStorage.setItem("matchInfo", matchInfo);
   };
-  const getMatchInfo = (): { matchId: number; round: 1 | 2, discarded: boolean } | null => {
+  const getMatchInfo = (): MatchInfo | null => {
     const matchInfo = localStorage.getItem("matchInfo");
     if (matchInfo) {
       return JSON.parse(matchInfo) as { matchId: number; round: 1 | 2; discarded: boolean };

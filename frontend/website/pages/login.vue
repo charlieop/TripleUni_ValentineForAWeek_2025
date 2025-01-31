@@ -52,11 +52,10 @@ const { fetchOpenId } = useHttp();
 
 const queryParams = route.query;
 const requestURL = "https://wechat-oauth.uuunnniii.com";
-const appID = "wx09ec18a3cf830379";
 let url =
   requestURL +
   "?appid=" +
-  appID +
+  APPID +
   "&redirect_uri=" +
   encodeURIComponent(window.location.href) +
   "&response_type=code&scope=snsapi_userinfo#wechat_redirect";

@@ -107,7 +107,6 @@ const { CONFIG } = useReactive();
 const openModal = ref(false);
 const openHelpModal = ref(false);
 
-
 const state = computed(() => {
   if (!CONFIG.value) return States.UNKNOWN;
   if (getDeleted()) return States.DELETE;
@@ -180,6 +179,9 @@ const state = computed(() => {
         var(--clr-primary) 0%,
         transparent 100%
       );
+  }
+  button.secondary {
+    background: var(--clr-background);
   }
 }
 

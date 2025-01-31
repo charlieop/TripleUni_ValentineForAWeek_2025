@@ -1,7 +1,5 @@
 <template>
   <div class="conten-wrapper">
-    <img :src="IMAGE_BASE_URL +  'heart3.webp'" alt="" class="decor-heart" />
-
     <h1>
       第{{ matchDetail?.round || "..." }}轮 -
       <span>
@@ -179,7 +177,7 @@ const partnerStatus = computed(() => {
 
 async function handleAcceptMatch() {
   const matchInfo = getMatchInfo();
-  if (matchInfo === null) {
+  if (matchInfo === null || matchInfo.matchId <= 0) {
     alert("意料之外的错误: 找不到本地match info");
     router.push("/");
     return;
@@ -198,7 +196,7 @@ async function handleAcceptMatch() {
 
 onMounted(() => {
   const matchInfo = getMatchInfo();
-  if (matchInfo === null) {
+  if (matchInfo === null || matchInfo.matchId <= 0) {
     alert("意料之外的错误: 找不到本地match info");
     router.push("/");
     return;
@@ -349,14 +347,5 @@ h2 {
   display: grid;
   gap: 1rem;
   grid-template-columns: 2fr 3fr;
-}
-
-.decor-heart {
-  position: fixed;
-  top: 10rem;
-  right: -0.25rem;
-  width: 10rem;
-  transform: rotate(40deg);
-  opacity: 0.3;
 }
 </style>

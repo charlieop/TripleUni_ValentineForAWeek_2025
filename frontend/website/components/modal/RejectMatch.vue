@@ -56,7 +56,7 @@ const router = useRouter();
 
 function handleCancelApplication() {
   const matchInfo = getMatchInfo();
-  if (matchInfo === null) {
+  if (matchInfo === null || matchInfo.matchId <= 0) {
     alert("意料之外的错误: 找不到本地match info");
     router.push("/");
     return;

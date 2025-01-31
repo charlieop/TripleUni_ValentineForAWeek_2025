@@ -1,6 +1,7 @@
 <template>
   <div class="match-wrapper">
     <img src="/imgs/heart1.svg" alt="" class="decor" />
+    <img :src="IMAGE_BASE_URL + 'heart3.webp'" alt="" class="decor-heart" />
     <div class="logo">
       <img
         :src="IMAGE_BASE_URL + 'logo-b.webp'"
@@ -34,12 +35,7 @@ useHead({
   title: "一周CP 2025 | 查看匹配结果",
 });
 
-const {
-  fetchApplicantId,
-  getApplicantHasPaid,
-  fetchMatchResult,
-  fetchMatchMentor,
-} = useHttp();
+const { fetchApplicantId, getApplicantHasPaid, fetchMatchResult } = useHttp();
 const {
   setMatchInfo,
   getMatchInfo,
@@ -142,6 +138,7 @@ onMounted(async () => {
   content: "";
   position: fixed;
   inset: 0;
+  pointer-events: none;
 }
 @media (prefers-color-scheme: dark) {
   .match-wrapper::before {
@@ -175,19 +172,26 @@ onMounted(async () => {
 
 .decor {
   position: fixed;
-  top: 40%;
-  left: -20%;
+  top: 45%;
+  left: -23%;
   width: 75%;
   transform: rotate(35deg);
   opacity: 0.6;
   transition: all 0.3s;
 }
-
 @media (prefers-color-scheme: dark) {
   .decor {
-    top: 45%;
-    left: -25%;
     opacity: 0.2;
   }
 }
+
+.decor-heart {
+  position: fixed;
+  top: 10rem;
+  right: -0.25rem;
+  width: 10rem;
+  transform: rotate(40deg);
+  opacity: 0.3;
+}
+
 </style>
