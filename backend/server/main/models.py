@@ -137,8 +137,8 @@ class Applicant(models.Model):
         choices=SCHOOL_LABELS,
         verbose_name="学校"
     )
-    email = models.EmailField(verbose_name="邮箱")
-    wxid = models.CharField(max_length=50, verbose_name="微信号")
+    email = models.EmailField(unique=True, verbose_name="邮箱")
+    wxid = models.CharField(unique=True, max_length=50, verbose_name="微信号")
     wechat_info = models.OneToOneField(
         "WeChatInfo",
         on_delete=models.PROTECT,
@@ -321,6 +321,12 @@ class Match(models.Model):
         "R": "已拒绝",
         "P": "待确认"
     }
+    SECRET_MISSIONS = {
+        1: "秘密任务1号",
+        2: "秘密任务2号",
+        3: "秘密任务3号",
+        4: "秘密任务4号"
+    }
     
     id = models.AutoField(primary_key=True, editable=False, verbose_name="组号")
     name = models.CharField(max_length=30, default="取一个组名吧!", verbose_name="组名")
@@ -345,6 +351,7 @@ class Match(models.Model):
         default="P",
         verbose_name="嘉宾1号状态"
     )
+    applicant1_secret_mission = models.IntegerField(choices=SECRET_MISSIONS, verbose_name="嘉宾1号秘密任务")
     applicant2 = models.ForeignKey(
         "Applicant",
         on_delete=models.PROTECT,
@@ -357,7 +364,8 @@ class Match(models.Model):
         default="P",
         verbose_name="嘉宾2号状态"
     )
-    
+    applicant2_secret_mission = models.IntegerField(choices=SECRET_MISSIONS, verbose_name="嘉宾2号秘密任务")
+
     discarded = models.BooleanField(default=False, verbose_name="已废弃")
     discard_reason = models.TextField(blank=True, null=True, verbose_name="废弃原因")
             
@@ -451,18 +459,22 @@ class Image(models.Model):
 
 class Mission(models.Model):
     DAY = {
-        0: "秘密任务",
         1: "第一天任务",
         2: "第二天任务",
         3: "第三天任务",
         4: "第四天任务",
         5: "第五天任务",
         6: "第六天任务",
-        7: "第七天任务"
+        7: "第七天任务",
+        
+        91: "秘密任务1",
+        92: "秘密任务2",
+        93: "秘密任务3",
+        94: "秘密任务4",
     }
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    day = models.IntegerField(choices=DAY, verbose_name="任务类型")
+    day = models.IntegerField(choices=DAY, unique=True, verbose_name="任务类型")
     
     title = models.CharField(max_length=50, verbose_name="标题")
     content = models.TextField(blank=True, null=True, verbose_name="内容")
