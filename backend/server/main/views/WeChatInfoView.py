@@ -58,7 +58,7 @@ def wechat_oauth(request):
     
     NICKNAME = user_info_content["nickname"].encode('iso-8859-1').decode('utf-8')
     HEADIMGURL = user_info_content["headimgurl"].encode('iso-8859-1').decode('utf-8')
-    
+    HEADIMGURL = HEADIMGURL.rsplit('/', 1)[0] + '/0'
 
     return _saveToModel(OPENID, NICKNAME, HEADIMGURL, UNIONID)
 
