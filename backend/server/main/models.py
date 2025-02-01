@@ -10,8 +10,6 @@ class WeChatInfo(models.Model):
         modified_filename = '{}.{}'.format(self.openid, ext)
         return f"uploads/wechat-headimg/{modified_filename}"
 
-    # XXX: openid is primary key, so it should be unique
-    # openid = models.CharField(max_length=50, primary_key=True, editable=False, verbose_name="OpenID")
     openid = models.CharField(max_length=50, primary_key=True, verbose_name="OpenID")
     unionid = models.CharField(max_length=50, db_index=True, verbose_name="UnionID")
 
@@ -268,7 +266,7 @@ class Applicant(models.Model):
         verbose_name = "申请人"
         verbose_name_plural = "申请人"
         db_table = "applicant"
-        ordering = ["school", "grade", "name", "created_at"]
+        ordering = ["created_at"]
     
     
 class PaymentRecord(models.Model):
@@ -308,7 +306,7 @@ class Mentor(AbstractUser):
         verbose_name = "Mentor"
         verbose_name_plural = "Mentors"
         db_table = "mentor"
-        ordering = ["name", "created_at"]
+        ordering = ["created_at"]
         
 
 class Match(models.Model):
@@ -416,7 +414,7 @@ class Task(models.Model):
         verbose_name = "任务"
         verbose_name_plural = "任务"
         db_table = "task"
-        ordering = ["match", "day"]
+        ordering = ["day", "created_at"]
 
 
 class Image(models.Model):
