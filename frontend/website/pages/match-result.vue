@@ -112,10 +112,10 @@ async function updatePaymentInfo() {
 }
 
 onMounted(async () => {
-  modalText.value = "月老正在寻找你的对象";
+  modalText.value = "小红娘正在寻找你的对象";
   loading.value = true;
   await updateMatchInfo();
-  modalText.value = "月老正在检查你的押金";
+  modalText.value = "小红娘正在检查你的押金";
   await updatePaymentInfo();
   loading.value = false;
   modalText.value = null;
@@ -193,5 +193,4 @@ onMounted(async () => {
   transform: rotate(40deg);
   opacity: 0.3;
 }
-
 </style>

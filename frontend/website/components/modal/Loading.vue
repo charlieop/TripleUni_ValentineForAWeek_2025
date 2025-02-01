@@ -27,7 +27,7 @@
         />
       </div>
       <h3>
-        {{ props.text || "正在联系月老" }}
+        {{ props.text || "正在联系小红娘" }}
         <span class="dots">...</span>
       </h3>
       <button>hidden</button>
@@ -77,11 +77,9 @@
 </template>
 
 <script setup lang="ts">
-
 const props = defineProps<{
   text: string | null;
 }>();
-
 </script>
 
 <style scoped>

@@ -24,7 +24,7 @@
     <p>
       你可以在
       <a
-        href="https://hkupootal.feishu.cn/docx/YZkqdJaTwoDZnZxmnHdcihmin6f"
+        href="https://mp.weixin.qq.com/s/F2IHbExetIvUc_eLENcYvw"
         target="_blank"
         >这里</a
       >

@@ -13,12 +13,12 @@
       <p>如果问题持续存在，请联系负责人、你的Mentor或是网站维护者。</p>
       <br />
       <p>
-        活动负责人: <br />
-        - 微信号: Xanaduwithinzenith-
+        技术/网站负责人: <br />
+        - 微信号: charlieop_
       </p>
       <p>
-        网站维护者: <br />
-        - 微信号: charlieop_
+        活动负责人: <br />
+        - 微信号: Xanaduwithinzenith-
       </p>
       <br />
       <template #footer>

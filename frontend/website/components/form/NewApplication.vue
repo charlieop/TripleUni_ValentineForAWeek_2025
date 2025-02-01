@@ -25,6 +25,8 @@
             'p_6',
             'h3_10',
             'p_8',
+            'h3_12',
+            'p_9',
             'divider',
             'checkbox',
           ]"
@@ -126,7 +128,7 @@
         <StaticElement
           name="p_7"
           tag="p"
-          content="<div><strong>本次活动为半自助形式, 参与者需要访问本网址 (valentine.tripleuni.com)&nbsp; 获取匹配结果, 查看、提交每日任务等...</strong><br><br>匹配成功的小组会被分配一个Mentor, ta的联系方式将在本网站展示, 请参与者主动添加Mentor缴纳押金, 在活动过程中如有疑问或遇到问题都可以与Mentor联系.</div>"
+          content="<div><strong>本次活动为自助形式, 参与者需要访问本网址 (valentine.tripleuni.com)&nbsp; 获取匹配结果, 支付押金, 查看、提交每日任务等...</strong><br><br>匹配成功的小组会被分配一个Mentor, ta的联系方式将在本网站展示, 请参与者主动添加Mentor并备注对应的编号, 在活动过程中如有疑问或遇到问题都可以与Mentor联系.</div>"
         />
         <StaticElement name="h3_7" tag="h3" content="时间线" top="2" />
         <StaticElement
@@ -138,7 +140,7 @@
         <StaticElement
           name="p_6"
           tag="p"
-          content="<div>匹配结果公布后, 参与者需要在对应轮次的押金缴纳ddl前添加Mentor微信并缴付押金 70 元人民币. 在付款后Mentor将会提供一个二维码, 扫描后转跳本网站并显示押金缴付成功. <br><br>若申请人未能在对应轮次的ddl前缴纳押金, 匹配将会作废且申请人将<strong>不能</strong>参与下一轮次的匹配.&nbsp;</div>"
+          content="<div>匹配结果公布后, 参与者需要在对应轮次的押金缴纳ddl前与本网址缴纳押金 70元人民币. 在付款后才能查看匹配CP的头像与昵称信息. <br><br>若申请人未能在对应轮次的ddl前缴纳押金, 匹配将会作废且申请人将<strong>不能</strong>参与下一轮次的匹配.&nbsp;</div>"
         />
         <StaticElement
           name="h3_10"
@@ -149,7 +151,13 @@
         <StaticElement
           name="p_8"
           tag="p"
-          content="<div>出于匹配目的, 我们将会收集并保存以下隐私信息:<br><br>[通过微信登陆授权]<br>你的微信头像<br>你的微信昵称<br>你的微信OpenID (用作网站登陆)<br><br>[通过填写问卷]<br>所有在问卷中填写的所有内容<br><br><strong>我们承诺将尽最大努力妥善保管你的隐私数据, 秉承最小权限原则限制他人不必要的访问.&nbsp;<br><br>我们承诺不会将这些数据提供给任何无关第三方.<br></strong><br></div>"
+          content="<div>出于匹配目的, 我们将会收集并保存以下隐私信息:<br><br>[通过微信登陆授权]<br>你的微信头像<br>你的微信昵称<br>你的微信OpenID (用作网站登陆, 微信支付)<br><br>[通过填写问卷]<br>所有在问卷中填写的所有内容<br><br><strong>我们承诺将尽最大努力妥善保管你的隐私数据, 秉承最小权限原则限制他人不必要的访问.&nbsp;<br><br>我们承诺不会将这些数据提供给任何无关第三方.<br></strong><br></div>"
+        />
+        <StaticElement name="h3_12" tag="h3" content="故障自助处理" top="2" />
+        <StaticElement
+          name="p_9"
+          tag="p"
+          content="<div>如果你在网站上遇到了错误, 可以尝试以下步骤修复:<br><br> 1. 打开网站首页<br> 2. 点击左上方的「?」 标签<br> 3. 点击「清除页面缓存」按钮<br> 4. 重新登录</div>"
         />
         <StaticElement name="divider" tag="hr" top="2" />
         <CheckboxElement
@@ -165,7 +173,7 @@
         <TextElement
           name="name"
           field-name="姓名"
-          label="你的姓名"
+          label="你的中文全名"
           placeholder="张三"
           :rules="['required', 'max:4']"
         />
@@ -233,7 +241,7 @@
           ]"
           label="你的学校邮箱"
           placeholder="example@example.com"
-          info="我们可能会发送验证码至此邮箱以验证归属"
+          description="我们会发送验证码至此邮箱以验证归属, 请确认邮箱填写正确"
         />
         <RadiogroupElement
           name="grade"
@@ -284,7 +292,7 @@
         <StaticElement
           name="p"
           tag="p"
-          content="<div>请通过滑动的方式选择你的MBTI.<br><br>如果你不确定自己的MBTI, 可以通过 <a href='https://www.16personalities.com\' target='blank'>https://www.16personalities.com</a><br>或其他网站进行测试.<br><br>如果你只知道自己的MBIT而不确定具体的百分比, 也可以通过以上网站进行测试获得, 或者自行评估.<br><br>注意: 全部选择中庸(50%) 并不会给你带来任何匹配优势 (反而可能带来劣势)</div>"
+          content="<div>请通过滑动的方式选择你的MBTI.<br><br>如果你不确定自己的MBTI, 可以通过 <a href='https://www.16personalities.com\' target='blank'>https://www.16personalities.com</a><br>或其他网站进行测试.<br><br>如果你只知道自己的MBTI而不确定具体的百分比, 也可以通过以上网站进行测试获得, 或者自行评估.<br><br>注意: 全部选择中庸(50%) 并不会给你带来任何匹配优势 (反而可能带来劣势)</div>"
         />
         <SliderElement
           name="mbti_ei"
@@ -681,7 +689,7 @@
         <StaticElement
           name="p_3"
           tag="p"
-          content="<div>对于软性要求, 你可能匹配到不符合你的选择的人选<br>以下选项<strong>不会减少</strong>你可匹配的人选数量</div>"
+          content="<div>对于软性要求, 你可能匹配到不符合你的选择的人选<br>以下选项<strong>不会减少</strong>你可匹配的人选数量<br><br>请注意:<br>全部选项选择「无偏好」<strong>不会给你带来任何匹配优势</strong>, 甚至可能会造成劣势。</div>"
         />
         <RadiogroupElement
           name="preferred_mbti_ei"
@@ -800,7 +808,7 @@
         <StaticElement
           name="p_4"
           tag="p"
-          content="<div>本次活动为半自助形式, 参与者需要访问本网址 (valentine.tripleuni.com)&nbsp; 获取匹配结果, 查看、提交每日任务等...<br><strong>Mentor将不会主动添加你, 请在网站上查看匹配结果</strong></div>"
+          content="<div>本次活动为自助形式, 参与者需要访问本网址 (valentine.tripleuni.com)&nbsp; 获取匹配结果, 查看、提交每日任务等...<br><strong>Mentor将不会主动添加你, 请在网站上查看匹配结果</strong></div>"
         />
         <StaticElement name="h3_5" tag="h3" content="一周CP时间线" top="1" />
         <StaticElement
@@ -819,7 +827,7 @@
         <CheckboxElement
           name="confirm1"
           field-name="信息无误"
-          text="我确认所填写的信息准确无误, 由信息填写错误而导致的任何问题, 我将负全部责任. 如果因为填写错误导致对方要求退出, 我的押金将全部 [不退还]"
+          text="我确认所填写的信息准确无误, 由信息填写错误而导致的任何问题, 我将负全部责任. 如果因为填写错误导致对方要求退出, 我的押金将完全 [不退还]"
           :submit="false"
           :rules="['accepted']"
         />
@@ -857,7 +865,7 @@ async function handleSubmit() {
     alert("表单初始化错误");
     return;
   }
-  loadingText.value = "通知月老中";
+  loadingText.value = "通知小红娘中";
   showLoader.value = true;
   const applicantId = getApplicantId();
   if (applicantId) {

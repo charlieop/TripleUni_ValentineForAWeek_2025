@@ -63,7 +63,7 @@
         </button>
       </div>
       <a
-        href="https://hkupootal.feishu.cn/docx/YZkqdJaTwoDZnZxmnHdcihmin6f"
+        href="https://mp.weixin.qq.com/s/F2IHbExetIvUc_eLENcYvw"
         target="_blank"
       >
         <button class="btn secondary" style="--_color: var(--clr-accent)">
@@ -82,6 +82,7 @@
   </div>
   <ModalHelp :model-value="openHelpModal" @close="openHelpModal = false" />
   <ModalCancelApplication :model-value="openModal" @close="openModal = false" />
+  <ModalMaintaining :model-value="true" />
 </template>
 
 <script setup lang="ts">
