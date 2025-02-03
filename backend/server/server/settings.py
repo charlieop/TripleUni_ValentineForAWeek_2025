@@ -40,19 +40,19 @@ DEBUG = True
 
 # CORS settings
 APPEND_SLASH=False
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_METHODS = (
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-)
-CORS_ALLOW_HEADERS = (
-    *default_headers,
-    "Authorization",
-)
+# CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_METHODS = (
+#     "DELETE",
+#     "GET",
+#     "OPTIONS",
+#     "PATCH",
+#     "POST",
+#     "PUT",
+# )
+# CORS_ALLOW_HEADERS = (
+#     *default_headers,
+#     "Authorization",
+# )
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ALLOWED_HOSTS = ["localhost", "192.168.71.91", "127.0.0.1"]
@@ -67,8 +67,14 @@ CACHES = {
     }
 }
 
+UNFOLD = {
+    "SITE_TITLE": "一周CP 信息管理后台",
+    "SITE_HEADER": "一周CP 管理后台",
+}
+
 # Application definition
 INSTALLED_APPS = [
+    "unfold",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

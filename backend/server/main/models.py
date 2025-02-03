@@ -4,6 +4,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 
+from django.contrib import admin
+
+
 class WeChatInfo(models.Model):
     def generateUploadPath(self, filename):
         ext = filename.split('.')[-1]
@@ -249,6 +252,9 @@ class Applicant(models.Model):
         blank=True,
         verbose_name="付款凭证"
     )
+    @admin.display(boolean=True, description='押金已支付')
+    def has_paid(self):
+        return self.payment is not None
     
     quitted = models.BooleanField(default=False, verbose_name="已退出")
     exclude = models.BooleanField(default=False, verbose_name="人工排除")
@@ -256,9 +262,6 @@ class Applicant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     
-    def hasPaid(self):
-        return self.payment is not None
-
     def __str__(self):
         return f"{self.name}-{Applicant.SEX[self.sex]}-{self.school}-{Applicant.GRADE[self.grade]}"
     
@@ -267,8 +270,8 @@ class Applicant(models.Model):
         verbose_name_plural = "申请人"
         db_table = "applicant"
         ordering = ["created_at"]
-    
-    
+
+
 class PaymentRecord(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
@@ -307,7 +310,7 @@ class Mentor(AbstractUser):
         verbose_name_plural = "Mentors"
         db_table = "mentor"
         ordering = ["created_at"]
-        
+
 
 class Match(models.Model):
     ROUNDS = {
