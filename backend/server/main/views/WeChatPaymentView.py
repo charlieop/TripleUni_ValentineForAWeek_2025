@@ -24,7 +24,7 @@ with open(settings.BASE_DIR / "SECRETS.json") as f:
 with open(settings.BASE_DIR / "apiclient_key.pem") as f:
     PRIVATE_KEY = f.read()
     
-PRICE = 1
+PRICE = 70 * 100
 EXPIRES_IN = 7 * 60
 DESCRIPTION = "Triple Uni 一周CP 2025 活动押金"
 NOTIFY_URL = "https://api.charlieop.com/api/v1/wechat/payment/"

@@ -259,6 +259,9 @@ class Applicant(models.Model):
     quitted = models.BooleanField(default=False, verbose_name="已退出")
     exclude = models.BooleanField(default=False, verbose_name="人工排除")
     
+    confirmed = models.BooleanField(default=False, verbose_name="已确认分组")
+    payment_expired = models.BooleanField(default=False, verbose_name="付款过期")
+    
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     

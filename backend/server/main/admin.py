@@ -30,7 +30,7 @@ class ApplicantAdmin(ModelAdmin):
     common_readonly_fields = [
         'id', 'name', 'sex', 'grade', 'school', 
         'email', 'wxid', 'wechat_info',
-        'preferred_wxid', 'continue_match', 'comment', 'quitted', 'payment', 'updated_at', 'created_at',
+        'preferred_wxid', 'continue_match', 'comment', 'payment', 'updated_at', 'created_at', 'confirmed', 'payment_expired'
     ]
     
     superuser_readonly_fields = common_readonly_fields + [
@@ -54,7 +54,7 @@ class ApplicantAdmin(ModelAdmin):
         return super().get_queryset(request).select_related('wechat_info')
     
     def get_readonly_fields(self, request, obj=None):
-        return self.superuser_readonly_fields if request.user.is_superuser else self.common_readonly_fields
+        return self.superuser_readonly_fields if request.user.is_superuser else self.common_readonly_fields + ['quitted']
 
     def get_exclude(self, request, obj):
         return [] if request.user.is_superuser else [

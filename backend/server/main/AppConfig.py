@@ -8,7 +8,7 @@ class AppConfig():
     
     DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
 
-    APPLICATION_DEADLINE = datetime(year=2025, month=2, day=4, hour=12, minute=00, second=00)
+    APPLICATION_DEADLINE = datetime(year=2025, month=2, day=4, hour=14, minute=00, second=00)
     FIRST_ROUND_MATCH_RESULTS_RELEASE = datetime(year=2025, month=2, day=4, hour=19, minute=00, second=00)
     FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE = datetime(year=2025, month=2, day=5, hour=23, minute=59, second=59)
     SECOND_ROUND_MATCH_RESULTS_RELEASE = datetime(year=2025, month=2, day=6, hour=8, minute=00, second=00)
