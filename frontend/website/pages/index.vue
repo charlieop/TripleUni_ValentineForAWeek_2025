@@ -82,7 +82,7 @@
   </div>
   <ModalHelp :model-value="openHelpModal" @close="openHelpModal = false" />
   <ModalCancelApplication :model-value="openModal" @close="openModal = false" />
-  <ModalMaintaining :model-value="true" />
+  <!-- <ModalMaintaining :model-value="true" /> -->
 </template>
 
 <script setup lang="ts">
@@ -111,17 +111,20 @@ const openHelpModal = ref(false);
 const state = computed(() => {
   if (!CONFIG.value) return States.UNKNOWN;
   if (getDeleted()) return States.DELETE;
+
   const now = new Date();
-  if (now < new Date(CONFIG.value.APPLICATION_DEADLINE)) {
+  if (now < convertToLocalTime(CONFIG.value.APPLICATION_DEADLINE)) {
     return getApplicantId() === null
       ? States.APPLICATION_OPEN
       : States.APPLICATION_SUBMITTED;
   }
-  if (now < new Date(CONFIG.value.FIRST_ROUND_MATCH_RESULTS_RELEASE)) {
+  if (
+    now < convertToLocalTime(CONFIG.value.FIRST_ROUND_MATCH_RESULTS_RELEASE)
+  ) {
     return States.APPLICATION_END;
   }
 
-  if (now < new Date(CONFIG.value.EVENT_START)) {
+  if (now < convertToLocalTime(CONFIG.value.EVENT_START)) {
     return States.MATCH_RESULT_AVALIABLE;
   }
 
@@ -129,7 +132,7 @@ const state = computed(() => {
     return States.NO_MATCH;
   }
 
-  if (now < new Date(CONFIG.value.EVENT_END)) {
+  if (now < convertToLocalTime(CONFIG.value.EVENT_END)) {
     return States.EVENT_START;
   }
   return States.EVENT_END;

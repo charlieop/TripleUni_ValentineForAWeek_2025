@@ -162,7 +162,7 @@ onMounted(async () => {
   bottom: -0.5rem;
   left: 50%;
   transform: translate(-50%, 100%);
-  width:max-content;
+  width: max-content;
 }
 
 h1 {

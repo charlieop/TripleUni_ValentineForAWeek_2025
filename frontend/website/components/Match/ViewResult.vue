@@ -51,7 +51,7 @@
         <p v-if="matchDetail?.round === 1">
           请耐心等候, 我们将很快为你进行第二轮匹配。结果公布时间为:<br />
           <strong>
-            {{
+            北京时间{{
               new Date(
                 CONFIG.SECOND_ROUND_MATCH_RESULTS_RELEASE
               ).toLocaleDateString("zh-CN", {
@@ -264,7 +264,7 @@ onMounted(() => {
 
   const interval = setInterval(() => {
     const now = new Date();
-    const eventStart = new Date(CONFIG.value.EVENT_START);
+    const eventStart = convertToLocalTime(CONFIG.value.EVENT_START);
     const diff = eventStart.getTime() - now.getTime();
     if (diff < 0) {
       router.push("/");

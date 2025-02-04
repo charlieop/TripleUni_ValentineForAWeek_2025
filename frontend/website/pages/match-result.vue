@@ -54,8 +54,9 @@ const router = useRouter();
 
 async function updateMatchInfo() {
   const storedMatchInfo = getMatchInfo();
+  const now = new Date();
   const roundNow =
-    new Date() < new Date(CONFIG.value.SECOND_ROUND_MATCH_RESULTS_RELEASE)
+    now < convertToLocalTime(CONFIG.value.SECOND_ROUND_MATCH_RESULTS_RELEASE)
       ? 1
       : 2;
   if (

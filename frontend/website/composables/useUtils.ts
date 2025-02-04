@@ -86,3 +86,11 @@ export interface MentorInfo {
   wechat: string;
   wechat_qrcode: string;
 }
+
+export function convertToLocalTime(dateString: string): Date {
+  const now = new Date();
+  const offsetDifference =  now.getTimezoneOffset() - 8 * 60;
+  const date = new Date(dateString);
+  date.setMinutes(date.getMinutes() + offsetDifference);
+  return date;
+};
