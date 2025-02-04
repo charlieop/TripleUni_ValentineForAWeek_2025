@@ -1,9 +1,9 @@
 export const API_URL = "https://api.charlieop.com/api/v1/";
 export const CONFIG_URL = "https://api.charlieop.com/media/config.json";
 export const API_HOST = "https://api.charlieop.com";
-// export const API_URL = "http://localhost:8000/api/v1/";
-// export const CONFIG_URL = "http://localhost:8000/media/config.json";
-// export const API_HOST = "http://localhost:8000";
+// export const API_URL = "http://192.168.3.4:8000/api/v1/";
+// export const CONFIG_URL = "http://192.168.3.4:8000/media/config.json";
+// export const API_HOST = "http://192.168.3.4:8000";
 
 export const APPID = "wx09ec18a3cf830379";
 
@@ -88,9 +88,7 @@ export interface MentorInfo {
 }
 
 export function convertToLocalTime(dateString: string): Date {
-  const now = new Date();
-  const offsetDifference =  now.getTimezoneOffset() - 8 * 60;
-  const date = new Date(dateString);
-  date.setMinutes(date.getMinutes() + offsetDifference);
-  return date;
-};
+  const offset = new Date().getTimezoneOffset() * 60 * 1000;
+  const LocalTime = new Date(dateString).getTime() - offset - 8 * 60 * 60 * 1000;
+  return new Date(LocalTime);
+}

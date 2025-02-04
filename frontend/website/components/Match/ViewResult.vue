@@ -33,8 +33,17 @@
         }"
         alt=""
       />
+      <div class="img-overlay" v-if="matchDetail?.my_status != 'A'">
+        你需要接受匹配方可查看清晰头像
+      </div>
       <div class="partner-info">
-        <p>微信昵称: {{ matchDetail?.partner_info.nickname }}</p>
+        <p v-if="matchDetail?.my_status == 'A'">
+          微信昵称: {{ matchDetail?.partner_info.nickname }}
+        </p>
+        <p v-else>
+          微信昵称:
+          {{ matchDetail?.partner_info.nickname.substring(0, 1) + "*****" }}
+        </p>
         <p>
           {{ matchDetail?.partner_school }} |
           {{ matchDetail?.partner_sex === "F" ? "女生" : "男生" }}
@@ -85,19 +94,10 @@
         </div>
       </div>
     </template>
-    <template
-      v-else-if="matchDetail?.my_status == 'P' && matchDetail?.round == 1"
-    >
+    <template v-else-if="matchDetail?.my_status == 'P'">
       <h2>请选择是否接受此轮匹配结果:</h2>
       <div class="action">
         <div class="btn-group">
-          <button
-            class="btn primary danger"
-            @click="openModal = true"
-            :disabled="loading"
-          >
-            不接受
-          </button>
           <button
             class="btn primary"
             style="--_color: var(--clr-success)"
@@ -105,6 +105,13 @@
             :disabled="loading"
           >
             接受匹配
+          </button>
+          <button
+            class="btn primary danger"
+            @click="openModal = true"
+            :disabled="loading"
+          >
+            不接受
           </button>
         </div>
       </div>
@@ -132,7 +139,16 @@
       </div>
     </template>
   </div>
-  <ModalRejectMatch v-model="openModal" @close="openModal = false" />
+  <ModalRejectMatchRoundOne
+    v-model="openModal"
+    @close="openModal = false"
+    v-if="matchDetail?.round === 1"
+  />
+  <ModalRejectMatchRoundTwo
+    v-model="openModal"
+    @close="openModal = false"
+    v-if="matchDetail?.round === 2"
+  />
 </template>
 
 <script setup lang="ts">
@@ -331,6 +347,30 @@ h1 {
   object-fit: cover;
   border-radius: 40px 15px 40% 15px / 15px 25px 15px 40px;
   overflow: hidden;
+  position: relative;
+}
+
+.img-overlay {
+  position: absolute;
+  padding: 2rem 3rem;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--clr-primary-dark);
+  display: grid;
+  font-size: var(--fs-400);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  z-index: 2;
+  border-radius: 40px 15px 40% 15px / 15px 25px 15px 40px;
 }
 
 .head-img-frame img.darken {
@@ -395,7 +435,7 @@ h2 {
   margin-block: 1rem;
   display: grid;
   gap: 1rem;
-  grid-template-columns: 2fr 3fr;
+  grid-template-columns: 3fr 1fr;
 }
 
 .wechat-info {
