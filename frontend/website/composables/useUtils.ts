@@ -1,9 +1,9 @@
 export const API_URL = "https://api.charlieop.com/api/v1/";
 export const CONFIG_URL = "https://api.charlieop.com/media/config.json";
 export const API_HOST = "https://api.charlieop.com";
-// export const API_URL = "http://192.168.71.91:8000/api/v1/";
-// export const CONFIG_URL = "http://192.168.71.91:8000/media/config.json";
-// export const API_HOST = "http://192.168.71.91:8000";
+// export const API_URL = "http://localhost:8000/api/v1/";
+// export const CONFIG_URL = "http://localhost:8000/media/config.json";
+// export const API_HOST = "http://localhost:8000";
 
 export const APPID = "wx09ec18a3cf830379";
 

@@ -10,7 +10,6 @@ from rest_framework.exceptions import NotFound, AuthenticationFailed
 
 from ..mixin import UtilMixin, Gone
 from ..models import PaymentRecord
-from..AppConfig import AppConfig
 
 from django.conf import settings
 import json

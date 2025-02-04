@@ -42,10 +42,10 @@ export const useStore = () => {
     discarded: boolean = false
   ): void => {
     const matchInfo = JSON.stringify({ matchId, round, discarded });
-    localStorage.setItem("matchInfo", matchInfo);
+    sessionStorage.setItem("matchInfo", matchInfo);
   };
   const getMatchInfo = (): MatchInfo | null => {
-    const matchInfo = localStorage.getItem("matchInfo");
+    const matchInfo = sessionStorage.getItem("matchInfo");
     if (matchInfo) {
       return JSON.parse(matchInfo) as { matchId: number; round: 1 | 2; discarded: boolean };
     }
@@ -53,6 +53,7 @@ export const useStore = () => {
   };
   const clearMatchInfo = (): void => {
     localStorage.removeItem("matchInfo");
+    sessionStorage.removeItem("matchInfo");
   };
 
   const setPaid = (): void => {

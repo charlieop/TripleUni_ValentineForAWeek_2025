@@ -49,10 +49,25 @@
           {{ matchDetail?.discard_reason || "未知" }}
         </h3>
         <p v-if="matchDetail?.round === 1">
-          请耐心等候, 我们将很快为你进行第二轮匹配。<br />
+          请耐心等候, 我们将很快为你进行第二轮匹配。结果公布时间为:<br />
+          <strong>
+            {{
+              new Date(
+                CONFIG.SECOND_ROUND_MATCH_RESULTS_RELEASE
+              ).toLocaleDateString("zh-CN", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })
+            }}</strong
+          >
+          <br />
+          <br />
           请注意：我们不能保证在第二轮中为你找到合适的匹配人选。
           如果你在第二轮匹配结果公布后你仍然看到此界面，
-          即说明第二轮匹配失败。我们将会退还你的全部押金。
+          即说明第二轮匹配失败。我们将在活动结束后退还你的全部押金。
         </p>
         <div v-else>
           <p>
@@ -99,7 +114,21 @@
       <div class="action">
         <p>距离开始还有: {{ countdown }}</p>
         <p>准备好了吗? 祝你好运!</p>
-
+      </div>
+      <h2>你的负责Mentor:</h2>
+      <div class="action">
+        <p>
+          以下是负责Mentor的微信，在添加时请备注你的组号:
+          <strong>「第{{ match?.matchId }}组」</strong>
+        </p>
+      </div>
+      <div class="wechat-info" v-if="mentor">
+        <div class="hint">长按图片识别二维码</div>
+        <img
+          :src="API_HOST + mentor?.wechat_qrcode"
+          :alt="'微信号:' + mentor?.wechat"
+        />
+        <p>微信号: {{ mentor.wechat }}</p>
       </div>
     </template>
   </div>
@@ -129,7 +158,8 @@ const StatusToColor = {
   [PartnerStatus.PENDING]: "var(--clr-primary-dark)",
 };
 
-const { fetchMatchPartner, postMatchConfirmation } = useHttp();
+const { fetchMatchPartner, postMatchConfirmation, fetchMatchMentor } =
+  useHttp();
 const { setMatchInfo, getMatchInfo } = useStore();
 const { CONFIG } = useReactive();
 const router = useRouter();
@@ -139,6 +169,8 @@ const loading = ref(false);
 const countdown = ref("加载中...");
 
 const matchDetail = ref<MatchDetail | null>(null);
+const match = ref<MatchInfo | null>(null);
+const mentor = ref<MentorInfo | null>(null);
 
 const matchStatus = computed(() => {
   if (matchDetail.value === null) {
@@ -201,6 +233,8 @@ onMounted(() => {
     router.push("/");
     return;
   }
+  match.value = matchInfo;
+
   fetchMatchPartner(matchInfo.matchId)
     .then((fetchedMatchDetail: MatchDetail) => {
       matchDetail.value = fetchedMatchDetail;
@@ -212,6 +246,21 @@ onMounted(() => {
       alert("获取匹配结果失败: " + error.message);
       router.push("/");
     });
+
+  fetchMatchMentor(matchInfo.matchId).then(
+    (m) => {
+      if (m === null) {
+        alert("意料之外的错误: 无Mentor信息");
+        router.push("/");
+        return;
+      }
+      mentor.value = m;
+    },
+    (error) => {
+      alert("获取Mentor信息出错: " + error.message);
+      router.push("/");
+    }
+  );
 
   const interval = setInterval(() => {
     const now = new Date();
@@ -347,5 +396,31 @@ h2 {
   display: grid;
   gap: 1rem;
   grid-template-columns: 2fr 3fr;
+}
+
+.wechat-info {
+  position: relative;
+  margin: 2rem 1rem;
+  border-radius: 5px;
+  border: 5px solid var(--clr-primary);
+}
+.wechat-info p {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-600);
+  color: var(--clr-text--muted);
+  z-index: -1;
+  transform: translate(-50%, -50%);
+}
+.hint {
+  position: absolute;
+  color: var(--clr-text--muted);
+  bottom: -0.5rem;
+  left: 50%;
+  width: max-content;
+  transform: translate(-50%, 100%);
 }
 </style>

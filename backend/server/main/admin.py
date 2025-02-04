@@ -179,7 +179,35 @@ class MentorAdmin(UserAdmin):
 
 @admin.register(Match)
 class MatchAdmin(ModelAdmin):
-    pass
+    list_display = ['id', 'name', 'get_applicant1_name', 'get_applicant2_name', 'discarded', 'get_mentor_name']
+    ordering = ['discarded', 'id']
+    list_display_links = list_display
+    
+    def get_list_filter(self, request):
+        return ['discarded', 'mentor__name'] if request.user.is_superuser else ['discarded']
+    
+    def get_search_fields(self, request):
+        return ['id', 'name', 'applicant1__name', 'applicant2__name', 'applicant1__wxid', 'applicant2__wxid'] if request.user.is_superuser else ['name', 'applicant1__name', 'applicant2__name', 'applicant1__wxid', 'applicant2__wxid']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(mentor=request.user)
+        qs.select_related('applicant1', 'applicant2', 'mentor')
+        return qs
+    
+    @admin.display(description='嘉宾1 (F)', ordering='applicant1__name')
+    def get_applicant1_name(self, obj):
+        return obj.applicant1.name
+    
+    @admin.display(description='嘉宾2 (M)', ordering='applicant2__name')
+    def get_applicant2_name(self, obj):
+        return obj.applicant2.name
+    
+    @admin.display(description='Mentor', ordering='mentor__name')
+    def get_mentor_name(self, obj):
+        return obj.mentor.name
+
 
 @admin.register(Task)
 class TaskAdmin(ModelAdmin):
