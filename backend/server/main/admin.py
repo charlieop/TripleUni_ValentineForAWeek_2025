@@ -128,7 +128,7 @@ class WeChatInfoAdmin(ModelAdmin):
 
 @admin.register(PaymentRecord)
 class PaymentRecordAdmin(ModelAdmin):
-    search_fields = ['applicant__name', 'applicant__wxid']
+    search_fields = ['applicant__name', 'applicant__wxid', 'transaction_id', 'out_trade_no']
     list_display = ['applicant', 'created_at']
 
     def get_queryset(self, request):
