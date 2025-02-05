@@ -40,22 +40,23 @@ DEBUG = True
 
 # CORS settings
 APPEND_SLASH=False
-# CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOW_METHODS = (
-#     "DELETE",
-#     "GET",
-#     "OPTIONS",
-#     "PATCH",
-#     "POST",
-#     "PUT",
-# )
-# CORS_ALLOW_HEADERS = (
-#     *default_headers,
-#     "Authorization",
-# )
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "Authorization",
+    "Accept-Language",
+)
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-ALLOWED_HOSTS = ["localhost", "192.168.71.91", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "192.168.3.4", "127.0.0.1"]
 # ALLOWED_HOSTS = ["api.charlieop.com"]
 
 

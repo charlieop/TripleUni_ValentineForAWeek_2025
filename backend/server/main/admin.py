@@ -22,7 +22,6 @@ class ApplicantHasPaidFilter(admin.SimpleListFilter):
         if self.value() == 'False':
             return queryset.filter(payment__isnull=True)
         return queryset
-
 @admin.register(Applicant)
 class ApplicantAdmin(ModelAdmin):
     search_fields = ['name', 'wxid', 'wechat_info__nickname']
@@ -30,21 +29,15 @@ class ApplicantAdmin(ModelAdmin):
     common_readonly_fields = [
         'id', 'name', 'sex', 'grade', 'school', 
         'email', 'wxid', 'wechat_info',
-        'preferred_wxid', 'continue_match', 'comment', 'payment', 'updated_at', 'created_at', 'confirmed', 'payment_expired'
-    ]
-    
-    superuser_readonly_fields = common_readonly_fields + [
-        'mbti_ei', 'mbti_sn', 'mbti_tf', 'mbti_jp', 
-        'hobby1', 'hobby2', 'hobby3',
-        'preferred_sex', 'preferred_grades', 'preferred_schools',
-        'preferred_mbti_ei', 'preferred_mbti_sn', 'preferred_mbti_tf', 'preferred_mbti_jp',
-        'travel_destination', 'superpower', 'use_of_money', 'family', 'lifestyle',
+        'preferred_wxid', 'continue_match', 'comment', 'payment', 'updated_at', 'created_at', 'confirmed', 'payment_expired', 'quitted'
     ]
 
     list_display = ['name', 'school', 'grade', 'sex', 'get_nickname', 'has_paid', 'comment', 'quitted', 'exclude', 'created_at']
     list_editable = ['exclude']
     list_filter = ['quitted', 'exclude', ApplicantHasPaidFilter, 'school', 'grade', 'sex']
     list_display_links = ['name', 'school', 'grade', 'sex', 'get_nickname', 'created_at']
+    autocomplete_fields = ['wechat_info', 'payment']
+
     
     @admin.display(description='微信昵称', ordering='wechat_info__nickname')
     def get_nickname(self, obj):
@@ -54,7 +47,7 @@ class ApplicantAdmin(ModelAdmin):
         return super().get_queryset(request).select_related('wechat_info')
     
     def get_readonly_fields(self, request, obj=None):
-        return self.superuser_readonly_fields if request.user.is_superuser else self.common_readonly_fields + ['quitted']
+        return [] if request.user.is_superuser else self.common_readonly_fields
 
     def get_exclude(self, request, obj):
         return [] if request.user.is_superuser else [
@@ -64,7 +57,9 @@ class ApplicantAdmin(ModelAdmin):
             'preferred_mbti_ei', 'preferred_mbti_sn', 'preferred_mbti_tf', 'preferred_mbti_jp',
             'travel_destination', 'superpower', 'use_of_money', 'family', 'lifestyle'
         ]
-    
+
+
+
 class WechatInfoHasAppliedFilter(admin.SimpleListFilter):
     title = "是否提交申请"
     parameter_name = "has_applied"
@@ -81,10 +76,10 @@ class WechatInfoHasAppliedFilter(admin.SimpleListFilter):
         if self.value() == 'False':
             return queryset.filter(applicant__isnull=True)
         return queryset
-
-
 @admin.register(WeChatInfo)
 class WeChatInfoAdmin(ModelAdmin):
+    search_fields = ['nickname', 'openid']
+    readonly_fields = ['head_image_large', 'created_at', 'get_applicant_link']
     list_display = ['nickname', 'head_image_tag', 'get_applicant_name', 'created_at']
     fieldsets = (
         (None, {
@@ -95,13 +90,6 @@ class WeChatInfoAdmin(ModelAdmin):
     list_filter = [WechatInfoHasAppliedFilter]
     def get_list_display_links(self, request, list_display):
         return list_display
-    def get_readonly_fields(self, request, obj):
-        readonly_fields = ['head_image_large', 'created_at']
-        readonly_fields.append('get_applicant_link')
-        if request.user.is_superuser:
-            readonly_fields.append('openid')
-            readonly_fields.append('unionid')
-        return readonly_fields
     def get_exclude(self, request, obj):
         return [] if request.user.is_superuser else [
             'openid', 'unionid'
@@ -137,19 +125,44 @@ class WeChatInfoAdmin(ModelAdmin):
         return "无头像"
 
 
+
 @admin.register(PaymentRecord)
 class PaymentRecordAdmin(ModelAdmin):
-    pass
+    search_fields = ['applicant__name', 'applicant__wxid']
+    list_display = ['applicant', 'created_at']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('applicant')
+    
+    def get_fields(self, request, obj):
+        return ['applicant', 'transaction_id', 'out_trade_no', 'created_at'] if request.user.is_superuser else []
+    def get_readonly_fields(self, request, obj = ...):
+        return ['applicant', 'created_at'] if request.user.is_superuser else []
+    
+
+    @admin.display(description='申请人', ordering='applicant__name')
+    def get_applicant_name(self, obj):
+        return obj.applicant.name
+    
+    @admin.display(description='申请人微信ID', ordering='applicant__wxid')
+    def get_applicant_wxid(self, obj):
+        return obj.applicant.wxid
+
+
 
 class MentorCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = Mentor
         fields = ('username', 'email', 'name', 'wechat', 'wechat_qrcode')
 
+
+
 class MentorChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = Mentor
         fields = ('username', 'email', 'name', 'wechat', 'wechat_qrcode')
+
+
 
 @admin.register(Mentor)
 class MentorAdmin(UserAdmin):
@@ -177,17 +190,48 @@ class MentorAdmin(UserAdmin):
             obj.is_staff = True
         super().save_model(request, obj, form, change)
 
+
+
+class MatchSuccessFilter(admin.SimpleListFilter):
+    title = "已成功匹配"
+    parameter_name = "has_matched"
+
+    def lookups(self, request, model_admin):
+        return [
+            ('True', "已成功"),
+            ('False', "未成功"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'True':
+            return queryset.filter(applicant1_status='A', applicant2_status='A')
+        if self.value() == 'False':
+            return queryset.exclude(applicant1_status='A', applicant2_status='A')
+        return queryset
 @admin.register(Match)
 class MatchAdmin(ModelAdmin):
-    list_display = ['id', 'name', 'get_applicant1_name', 'get_applicant2_name', 'discarded', 'get_mentor_name']
+    list_display = ['id', 'get_applicant1_name', 'get_applicant2_name','get_applicant1_haspaid', 'get_applicant2_haspaid', 'get_confirmed', 'discarded', 'get_mentor_name']
     ordering = ['discarded', 'id']
     list_display_links = list_display
+    readonly_fields = ['get_applicant1_wxid', 'get_applicant2_wxid', 'get_applicant1_haspaid', 'get_applicant2_haspaid']
+    fieldsets = (
+        (None, {
+            'fields': (
+                ('applicant1', 'get_applicant1_wxid'),
+                ('applicant1_status', 'get_applicant1_haspaid'),
+                ('applicant2', 'get_applicant2_wxid'),
+                ('applicant2_status', 'get_applicant2_haspaid'),
+                ('mentor', 'round'), 'discarded', 'discard_reason'
+            )
+        }),
+    )
+    autocomplete_fields = ['applicant1', 'applicant2']
     
     def get_list_filter(self, request):
-        return ['discarded', 'mentor__name'] if request.user.is_superuser else ['discarded']
+        return [MatchSuccessFilter, 'discarded', 'mentor__name'] if request.user.is_superuser else [MatchSuccessFilter, 'discarded']
     
     def get_search_fields(self, request):
-        return ['id', 'name', 'applicant1__name', 'applicant2__name', 'applicant1__wxid', 'applicant2__wxid'] if request.user.is_superuser else ['name', 'applicant1__name', 'applicant2__name', 'applicant1__wxid', 'applicant2__wxid']
+        return ['id', 'applicant1__name', 'applicant2__name', 'applicant1__wxid', 'applicant2__wxid'] if request.user.is_superuser else ['applicant1__name', 'applicant2__name', 'applicant1__wxid', 'applicant2__wxid']
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -204,9 +248,30 @@ class MatchAdmin(ModelAdmin):
     def get_applicant2_name(self, obj):
         return obj.applicant2.name
     
+    @admin.display(description='嘉宾1已支付',boolean=True,)
+    def get_applicant1_haspaid(self, obj):
+        return obj.applicant1.payment is not None
+    
+    @admin.display(description='嘉宾2已支付',boolean=True,)
+    def get_applicant2_haspaid(self, obj):
+        return obj.applicant2.payment is not None
+    
+    @admin.display(description='嘉宾1微信ID', ordering='applicant1__wxid')
+    def get_applicant1_wxid(self, obj):
+        return obj.applicant1.wxid
+    
+    @admin.display(description='嘉宾2微信ID', ordering='applicant2__wxid')
+    def get_applicant2_wxid(self, obj):
+        return obj.applicant2.wxid
+    
+    @admin.display(description='已成功', boolean=True)
+    def get_confirmed(self, obj):
+        return obj.applicant1_status == "A" and obj.applicant2_status == "A"
+    
     @admin.display(description='Mentor', ordering='mentor__name')
     def get_mentor_name(self, obj):
         return obj.mentor.name
+
 
 
 @admin.register(Task)
@@ -214,9 +279,12 @@ class TaskAdmin(ModelAdmin):
     date_hierarchy = 'created_at'
 
 
+
 @admin.register(Image)
 class ImageAdmin(ModelAdmin):
     pass
+
+
 
 @admin.register(Mission)
 class MissionAdmin(ModelAdmin):

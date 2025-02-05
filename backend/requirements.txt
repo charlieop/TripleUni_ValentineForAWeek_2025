@@ -7,3 +7,4 @@ Pillow
 requests
 redis
 wechatpayv3
+django-unfold

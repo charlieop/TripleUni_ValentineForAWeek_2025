@@ -75,8 +75,6 @@ class MatchPartnerView(APIView, UtilMixin):
         match = self.get_match(pk, openid)
         self.assert_match_results_released(match)
         self.assert_match_confirm_deadline(match)
-        if match.round == 2:
-            raise PermissionDenied("在第二轮中你无法选择拒绝匹配")
         
         my_index, me, partner = self.get_match_participants(match, openid)
         self.assert_match_auth(match, me)
@@ -86,9 +84,9 @@ class MatchPartnerView(APIView, UtilMixin):
             raise Conflict(f"你已经选择了{my_status}, 无法更改")
         
         if my_index == 1:
-            match.applicant1_status = "A" if action == "A" else "R"
+            match.applicant1_status = action
         else:
-            match.applicant2_status = "A" if action == "A" else "R"
+            match.applicant2_status = action
         
         if action == "R":
             match.discarded = True
