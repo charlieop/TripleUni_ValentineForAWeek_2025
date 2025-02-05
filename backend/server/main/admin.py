@@ -182,7 +182,7 @@ class MentorAdmin(UserAdmin):
             'fields': ('username', 'password1', 'password2', 'is_staff', 'is_active', 'groups', 'user_permissions')}
         ),
     )
-    search_fields = ('username',)
+    search_fields = ('username', 'name')
     ordering = ('username',)
 
     def save_model(self, request, obj, form, change):
@@ -215,17 +215,25 @@ class MatchAdmin(ModelAdmin):
     list_display_links = list_display
     readonly_fields = ['get_applicant1_wxid', 'get_applicant2_wxid', 'get_applicant1_haspaid', 'get_applicant2_haspaid']
     fieldsets = (
-        (None, {
+        ("嘉宾1号信息", {
             'fields': (
                 ('applicant1', 'get_applicant1_wxid'),
-                ('applicant1_status', 'get_applicant1_haspaid'),
+                ('applicant1_secret_mission',  'applicant1_status', 'get_applicant1_haspaid'),
+            )
+        }),
+        ("嘉宾2号信息", {
+            'fields': (
                 ('applicant2', 'get_applicant2_wxid'),
-                ('applicant2_status', 'get_applicant2_haspaid'),
+                ('applicant2_secret_mission', 'applicant2_status', 'get_applicant2_haspaid'),
+            )
+        }),
+        ("配对信息", {
+            'fields': (
                 ('mentor', 'round'), 'discarded', 'discard_reason'
             )
         }),
     )
-    autocomplete_fields = ['applicant1', 'applicant2']
+    autocomplete_fields = ['applicant1', 'applicant2', 'mentor']
     
     def get_list_filter(self, request):
         return [MatchSuccessFilter, 'discarded', 'mentor__name'] if request.user.is_superuser else [MatchSuccessFilter, 'discarded']
