@@ -24,8 +24,7 @@ class MissionView(APIView, UtilMixin):
         if missions is None:
             return Response(f"找不到第{days_passed}天的任务", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         serializer = GetMissionSerializer(missions)
-        return Response(serializer.data)
-
+        return Response({"data": serializer.data} )
 
 class SecretMissionView(APIView, UtilMixin):
     def get(self, request):
@@ -46,4 +45,4 @@ class SecretMissionView(APIView, UtilMixin):
             return Response("找不到你的秘密任务", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         serializer = GetMissionSerializer(missions)
-        return Response(serializer.data)
+        return Response({"data": serializer.data} )

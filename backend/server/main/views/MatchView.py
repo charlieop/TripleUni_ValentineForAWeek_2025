@@ -9,6 +9,7 @@ from ..mixin import UtilMixin, Conflict, PaymentRequired
 from ..models import Match
 from ..serializers.MentorSerializer import GetMentorSerializer
 from ..serializers.WeChatInfoSerializer import GetWeChatInfoSerializer
+from ..serializers.TaskSerializer import GetTaskSerializer
 
 from ..AppConfig import AppConfig
 
@@ -29,7 +30,6 @@ class MatchMentorView(APIView, UtilMixin):
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         self.assert_match_results_released(match)
-        self.assert_match_confirm_deadline(match)
         mentor = match.mentor
         
         serializer = GetMentorSerializer(mentor)
@@ -45,7 +45,6 @@ class MatchPartnerView(APIView, UtilMixin):
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)
         self.assert_match_results_released(match)
-        self.assert_match_confirm_deadline(match)
         my_index, me, partner = self.get_match_participants(match, openid)
         if me.payment is None:
             raise PaymentRequired("你需要支付押金才能继续")
@@ -111,18 +110,13 @@ class MatchDetailView(APIView, UtilMixin):
         total_score = 0
         
         for task in match.tasks.all().order_by("day"):
-            tasks.append({
-                "day": task.day,
-                "completed": task.basic_completed,
-                "basic_score": task.basic_score,
-                "bonus_score": task.bonus_score,
-                "daily_score": task.daily_score,
-            })
+            tasks.append(GetTaskSerializer(task).data)
             total_score += task.basic_score or 0
             total_score += task.bonus_score or 0
             total_score += task.daily_score or 0
         
         return_data = {
+            "id": match.id,
             "name": match.name,
             "my_info": GetWeChatInfoSerializer(me.wechat_info).data,
             "partner_info": GetWeChatInfoSerializer(partner.wechat_info).data,

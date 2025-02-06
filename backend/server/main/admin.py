@@ -116,7 +116,7 @@ class WeChatInfoAdmin(ModelAdmin):
     @admin.display(description='头像')
     def head_image_tag(self, obj):
         if obj.head_image_url:
-            return format_html('<img src="{}" width="50" height="50" />'.format(obj.head_image_url))
+            return format_html('<img src="{}" width="100" height="100" />'.format(obj.head_image_url))
         return "无头像"
     @admin.display(description='头像')
     def head_image_large(self, obj):
@@ -229,7 +229,7 @@ class MatchAdmin(ModelAdmin):
         }),
         ("配对信息", {
             'fields': (
-                ('mentor', 'round'), 'discarded', 'discard_reason'
+                'name', ('mentor', 'round'), 'discarded', 'discard_reason'
             )
         }),
     )

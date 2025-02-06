@@ -10,10 +10,9 @@ class GetTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = [
-            "day", "submit_text", "submit_by",
+            "day", "submit_text",
             "basic_completed", "basic_score",
             "bonus_score", "daily_score",
-            "created_at", "updated_at",
             "imgs"
         ]
         read_only_fields = fields
