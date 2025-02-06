@@ -44,7 +44,7 @@
 <script setup lang="ts">
 const { getMatchInfo } = useStore();
 const { CONFIG } = useReactive();
-const round = getMatchInfo()?.round || 1;
+const round = 2;
 </script>
 
 <style scoped>

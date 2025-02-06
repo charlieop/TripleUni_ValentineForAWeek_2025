@@ -58,9 +58,6 @@
         <router-link to="/match" v-if="state === States.EVENT_END">
           <button class="btn primary">回看记录</button>
         </router-link>
-        <button class="btn primary" disabled v-if="state === States.NO_MATCH">
-          无匹配记录
-        </button>
       </div>
       <a
         href="https://mp.weixin.qq.com/s/F2IHbExetIvUc_eLENcYvw"
@@ -104,6 +101,7 @@ enum States {
 
 const router = useRouter();
 const { getApplicantId, getDeleted, getMatchInfo } = useStore();
+const { fetchMatchResult } = useHttp();
 const { CONFIG } = useReactive();
 const openModal = ref(false);
 const openHelpModal = ref(false);
@@ -126,10 +124,6 @@ const state = computed(() => {
 
   if (now < convertToLocalTime(CONFIG.value.EVENT_START)) {
     return States.MATCH_RESULT_AVALIABLE;
-  }
-
-  if (getMatchInfo() === null) {
-    return States.NO_MATCH;
   }
 
   if (now < convertToLocalTime(CONFIG.value.EVENT_END)) {

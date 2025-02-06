@@ -180,6 +180,54 @@ export const useHttp = () => {
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
 
+  const fetchMatch = async (match_id: number): Promise<Match> => {
+    const response = await _fetch(`matches/${match_id}/`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data as Match;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
+  const patchMatchName = async (
+    match_id: number,
+    name: string
+  ): Promise<boolean> => {
+    const response = await _fetch(`matches/${match_id}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
+    });
+    if (response.status === 200) {
+      return true;
+    }
+    const data = await response.json();
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
+  const fetchSecretMission = async (): Promise<Mission> => {
+    const response = await _fetch("secret-missions/", {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data as Mission;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
+  const fetchMission = async (): Promise<Mission> => {
+    const response = await _fetch("missions/", {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data as Mission;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
   return {
     fetchConfig,
     fetchOpenId,
@@ -199,5 +247,12 @@ export const useHttp = () => {
     postMatchConfirmation,
 
     requestPayment,
+
+    fetchMatch,
+    patchMatchName,
+
+    fetchSecretMission,
+    fetchMission,
+    
   };
 };

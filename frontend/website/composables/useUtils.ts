@@ -89,6 +89,40 @@ export interface MentorInfo {
 
 export function convertToLocalTime(dateString: string): Date {
   const offset = new Date().getTimezoneOffset() * 60 * 1000;
-  const LocalTime = new Date(dateString).getTime() - offset - 8 * 60 * 60 * 1000;
+  const LocalTime =
+    new Date(dateString).getTime() - offset - 8 * 60 * 60 * 1000;
   return new Date(LocalTime);
+}
+
+export interface Task {
+  day: number;
+  submit_text: string;
+  basic_score: number;
+  bonus_score: number;
+  daily_score: number;
+  imgs: Array<{ id: string; path: string }>;
+}
+
+export interface Match {
+  id: number;
+  name: string;
+  my_info: {
+    nickname: string;
+    head_image: string;
+    head_image_url: string;
+  };
+  partner_info: {
+    nickname: string;
+    head_image: string;
+    head_image_url: string;
+  };
+  partner_wxid: string;
+  tasks: Task[];
+  total_score: number;
+}
+
+export interface Mission {
+  title: string;
+  content: string;
+  link: string;
 }

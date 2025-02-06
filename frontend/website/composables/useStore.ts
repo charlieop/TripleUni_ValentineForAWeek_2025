@@ -1,3 +1,5 @@
+import Match from "~/pages/match.vue";
+
 export const useStore = () => {
   const setOpenId = (openId: string): void => {
     localStorage.setItem("openId", openId);
@@ -56,6 +58,20 @@ export const useStore = () => {
     sessionStorage.removeItem("matchInfo");
   };
 
+  const setMatch = (match: Match) => {
+    sessionStorage.setItem("match", JSON.stringify(match));
+  }
+  const getMatch = (): Match | null => {
+    const match = sessionStorage.getItem("match");
+    if (match) {
+      return JSON.parse(match) as Match;
+    }
+    return null;
+  }
+  const clearMatch = () => {
+    sessionStorage.removeItem("match");
+  }
+
   const setPaid = (): void => {
     localStorage.setItem("paid", "true");
   }
@@ -86,5 +102,9 @@ export const useStore = () => {
     setPaid,
     getPaid,
     clearPaid,
+
+    setMatch,
+    getMatch,
+    clearMatch,
   };
 };

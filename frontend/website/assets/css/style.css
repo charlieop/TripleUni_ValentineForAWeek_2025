@@ -15,9 +15,12 @@
     --clr-secondary-light: hsla(256, 72%, 70%, 0.5);
 
     --clr-accent: hsl(42, 100%, 60%);
+    --clr-accent-light: hsla(42, 100%, 60%, 0.8);
+
 
     --clr-success: hsl(120, 84%, 35%);
     --clr-danger: hsl(0, 87%, 44%);
+    --clr-failed: hsla(0, 0%, 99%, 0.277);
   }
 }
 @media (prefers-color-scheme: light) {
@@ -35,9 +38,11 @@
     --clr-secondary-light: hsla(256, 72%, 80%, 0.5);
 
     --clr-accent: hsl(42, 100%, 50%);
+    --clr-accent-light: hsla(42, 100%, 50%, 0.8);
 
     --clr-success: hsl(120, 88%, 41%);
     --clr-danger: hsl(0, 85%, 49%);
+    --clr-failed: hsla(0, 0%, 58%, 0.279);
   }
 }
 
