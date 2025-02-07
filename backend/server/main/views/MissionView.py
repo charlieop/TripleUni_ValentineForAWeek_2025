@@ -26,6 +26,7 @@ class MissionView(APIView, UtilMixin):
         serializer = GetMissionSerializer(missions)
         return Response({"data": serializer.data} )
 
+
 class SecretMissionView(APIView, UtilMixin):
     def get(self, request):
         self.assert_event_started()

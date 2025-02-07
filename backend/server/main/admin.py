@@ -244,7 +244,7 @@ class MatchAdmin(ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(mentor=request.user)
+            qs = qs.filter(mentor=request.user).filter(discarded=False)
         qs.select_related('applicant1', 'applicant2', 'mentor')
         return qs
     

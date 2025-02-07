@@ -34,7 +34,7 @@ class TaskDetailView(APIView, UtilMixin):
 
         task = self.get_task(match, day)
         if task is not None:
-            raise MethodNotAllowed(f"第{day}天的任务提交已经存在, 使用 PATCH 来更新")
+            raise MethodNotAllowed(f"第{day}天的任务提交已经存在, 请刷新页面")
         
         data = {
             "match": match.id,
@@ -61,7 +61,7 @@ class TaskDetailView(APIView, UtilMixin):
         
         task = self.get_task(match, day)
         if task is None:
-            raise NotFound(f"找不到第{day}天的任务提交, 使用 POST 来创建")
+            raise NotFound(f"找不到第{day}天的任务提交, 请刷新页面")
 
         data = {
             "submit_text": submit_text

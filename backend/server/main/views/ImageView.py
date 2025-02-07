@@ -35,15 +35,15 @@ class ImageView(APIView, UtilMixin):
         self.assert_task_open(day)
         if type(request.data) != QueryDict:
             raise ParseError("Field: \"image\" is required in body with multipart/form-data")
-        
+
         images = request.data.getlist("images", [])
         for img in images:
             if type(img) not in [InMemoryUploadedFile, TemporaryUploadedFile]:
                 raise UnsupportedMediaType("上传的内容中包含非图片内容")
-            if img.content_type not in ['image/jpeg', 'image/png', 'image/jpg', 'image/heic']:
-                raise UnsupportedMediaType("不支持的图片格式, 只支持JPEG, PNG, JPG, HEIC")
-            if img.size > 2 * 1024 * 1024:
-                raise ParseError('文件过大, 请保证图片大小在2MB以内')
+            if img.content_type not in ['image/jpeg', 'image/png', 'image/jpg']:
+                raise UnsupportedMediaType("不支持的图片格式, 只支持JPEG, PNG, JPG")
+            if img.size > 5 * 1024 * 1024:
+                raise ParseError('文件过大, 请保证图片大小在5MB以内')
         
         openid = self.get_openid(request)
         match = self.get_match(pk, openid)

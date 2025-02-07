@@ -15,7 +15,7 @@ class AppConfig():
     SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE = datetime(year=2025, month=2, day=7, hour=14, minute=00, second=00)
     EVENT_START = datetime(year=2025, month=2, day=7, hour=22, minute=00, second=00)
     FIRST_TASK_START = datetime(year=2025, month=2, day=8, hour=0, minute=00, second=00)
-    FIRST_TASK_DEADLINE = datetime(year=2025, month=2, day=9, hour=5, minute=00, second=00)
+    FIRST_TASK_DEADLINE = datetime(year=2025, month=2, day=9, hour=0, minute=30, second=00)
     EVENT_END = datetime(year=2025, month=2, day=15, hour=6, minute=00, second=00)
     
     
@@ -24,9 +24,9 @@ class AppConfig():
     # FIRST_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE = datetime(year=2024, month=2, day=5, hour=23, minute=59, second=59)
     # SECOND_ROUND_MATCH_RESULTS_RELEASE = datetime(year=2024, month=2, day=6, hour=8, minute=00, second=00)
     # SECOND_ROUND_MATCH_RESULTS_CONFIRMATION_DEADLINE = datetime(year=2024, month=2, day=7, hour=14, minute=00, second=00)
-    # EVENT_START = datetime(year=2024, month=2, day=7, hour=22, minute=00, second=00)
-    # FIRST_TASK_START = datetime(year=2024, month=2, day=8, hour=0, minute=00, second=00)
-    # FIRST_TASK_DEADLINE = datetime(year=2024, month=2, day=9, hour=5, minute=00, second=00)
+    # EVENT_START = datetime(year=2024, month=2, day=5, hour=22, minute=00, second=00)
+    # FIRST_TASK_START = datetime(year=2025, month=2, day=4, hour=0, minute=00, second=00)
+    # FIRST_TASK_DEADLINE = datetime(year=2025, month=2, day=4, hour=23, minute=59, second=00)
     # EVENT_END = datetime(year=2024, month=2, day=15, hour=6, minute=00, second=00)
 
     @staticmethod

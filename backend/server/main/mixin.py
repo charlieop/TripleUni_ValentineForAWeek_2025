@@ -164,7 +164,7 @@ class UtilMixin:
             raise PermissionDenied("活动已经结束")
         
     def assert_task_open(self, day):
-        offset_day = day - 1
+        offset_day = int(day) - 1
         task_start_time = AppConfig.FIRST_TASK_START + timedelta(days=offset_day)
         task_end_time = AppConfig.FIRST_TASK_DEADLINE + timedelta(days=offset_day)
         

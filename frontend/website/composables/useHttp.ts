@@ -235,13 +235,14 @@ export const useHttp = () => {
     const response = await _fetch(`matches/${matchId}/tasks/day${day}/`, {
       method: "GET",
     });
-    const data = await response.json();
     if (response.status === 200) {
+      const data = await response.json();
       return data.data as Task;
     }
     if (response.status === 204) {
       return null;
     }
+    const data = await response.json();
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
 

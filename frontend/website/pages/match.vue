@@ -110,7 +110,7 @@ useHead({
   title: "一周CP 2025 | 我的CP组",
 });
 
-const { fetchMatchResult, fetchMatch, patchMatchName } = useHttp();
+const { fetchMatchResult, fetchMatch } = useHttp();
 const { setMatchInfo, getMatchInfo } = useStore();
 const { CONFIG } = useReactive();
 
