@@ -1,9 +1,9 @@
 export const API_URL = "https://api.charlieop.com/api/v1/";
 export const CONFIG_URL = "https://api.charlieop.com/media/config.json";
 export const API_HOST = "https://api.charlieop.com";
-// export const API_URL = "http://192.168.3.4:8000/api/v1/";
-// export const CONFIG_URL = "http://192.168.3.4:8000/media/config.json";
-// export const API_HOST = "http://192.168.3.4:8000";
+// export const API_URL = "http://10.89.70.161:8000/api/v1/";
+// export const CONFIG_URL = "http://10.89.70.161:8000/media/config.json";
+// export const API_HOST = "http://10.89.70.161:8000";
 
 export const APPID = "wx09ec18a3cf830379";
 
@@ -126,3 +126,51 @@ export interface Mission {
   content: string;
   link: string;
 }
+
+export const compressImage = (file: File): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const maxWidth = 1280;
+        const maxHeight = 1280;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("Image compression failed"));
+            }
+          },
+          "image/jpeg",
+          0.65
+        );
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};

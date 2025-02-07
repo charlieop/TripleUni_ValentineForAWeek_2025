@@ -228,6 +228,95 @@ export const useHttp = () => {
     throw new Error(`${JSON.stringify(data?.detail || data)}`);
   };
 
+  const fetchTask = async (
+    matchId: number,
+    day: number
+  ): Promise<Task | null> => {
+    const response = await _fetch(`matches/${matchId}/tasks/day${day}/`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return data.data as Task;
+    }
+    if (response.status === 204) {
+      return null;
+    }
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
+  const postTask = async (
+    matchId: number,
+    day: number,
+    submit_text: string
+  ): Promise<boolean> => {
+    const response = await _fetch(`matches/${matchId}/tasks/day${day}/`, {
+      method: "POST",
+      body: JSON.stringify({ submit_text }),
+    });
+    if (response.status === 201) {
+      return true;
+    }
+    const data = await response.json();
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
+  const postTaskImages = async (
+    matchId: number,
+    day: number,
+    imgs: File[]
+  ): Promise<boolean> => {
+    const formData = new FormData();
+    imgs.forEach((img, index) => {
+      formData.append("images", img, `image${index}.jpg`);
+    });
+    const response = await fetch(
+      API_URL + `matches/${matchId}/tasks/day${day}/images/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: getOpenId()!,
+          "Accept-Encoding": "gzip, deflate, br",
+        },
+        body: formData,
+      }
+    );
+    if (response.status === 201) {
+      return true;
+    }
+    const data = await response.json();
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+  const patchTask = async (
+    matchId: number,
+    day: number,
+    submit_text: string
+  ): Promise<boolean> => {
+    const response = await _fetch(`matches/${matchId}/tasks/day${day}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ submit_text }),
+    });
+    if (response.status === 200) {
+      return true;
+    }
+    const data = await response.json();
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
+  const deleteImage = async (matchId: number, day: number, imgId: string) => {
+    const response = await _fetch(
+      `matches/${matchId}/tasks/day${day}/images/${imgId}/`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (response.status === 204) {
+      return true;
+    }
+    const data = await response.json();
+    throw new Error(`${JSON.stringify(data?.detail || data)}`);
+  };
+
   return {
     fetchConfig,
     fetchOpenId,
@@ -253,6 +342,11 @@ export const useHttp = () => {
 
     fetchSecretMission,
     fetchMission,
-    
+
+    fetchTask,
+    postTask,
+    patchTask,
+    postTaskImages,
+    deleteImage,
   };
 };

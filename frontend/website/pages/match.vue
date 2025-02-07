@@ -16,7 +16,7 @@
         <li>
           <div
             class="task-item"
-            :style="{ '--_bg-color': 'var(--clr-accent-light)' }"
+            :style="{ '--_bg-color': '#f9edd1aa' }"
             @click="showSecretMissionModal = true"
           >
             秘密任务
@@ -147,7 +147,7 @@ const score_level_emoji = computed(() => {
 const STATE_TO_COLOR = {
   active: "var(--clr-primary-dark)",
   future: "var(--clr-primary-light)",
-  completed: "var(--clr-secondary-light)",
+  completed: "#b8de4a99",
   missing: "var(--clr-failed)",
 };
 const STATE_TO_TEXT = {
